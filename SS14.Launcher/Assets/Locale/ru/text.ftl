@@ -534,6 +534,8 @@ tab-options-verbose-launcher-logging-desc = Для тех случаев, ког
 tab-options-seasonal-branding = Сезонное оформление
 # Strings for entries in the server list (including home page)
 server-entry-raise = Поднять на самый верх
+server-entry-account-bind = Всегда заходить на этот сервер с текущего аккаунта
+server-entry-account-unbind = Аккаунт для этого сервера: { $name } (нажмите, чтобы отвязать)
 tab-options-desc-incompatible = Эта опция несовместима с вашей платформой, поэтому она отключена.
 connecting-privacy-policy-text-version-changed = Этот сервер обновил политику конфиденциальности с момента вашей последней игры. Вы должны принять новую версию перед подключением.
 connecting-privacy-policy-text = Перед подключением к этому серверу вам необходимо принять его политику конфиденциальности.

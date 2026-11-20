@@ -63,7 +63,11 @@ public static class CVars
     /// <summary>
     /// Enable multi-account support on release builds.
     /// </summary>
-    public static readonly CVarDef<bool> MultiAccounts = CVarDef.Create("MultiAccounts", false);
+    /// <remarks>
+    /// Enabled by default in this fork: the account drop down in the header lets you add accounts and switch
+    /// between them. Can still be turned off by setting this to false in the Config table.
+    /// </remarks>
+    public static readonly CVarDef<bool> MultiAccounts = CVarDef.Create("MultiAccounts", true);
 
     /// <summary>
     /// Currently selected login in the drop down.

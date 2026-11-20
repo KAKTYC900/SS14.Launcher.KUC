@@ -79,6 +79,14 @@
           Text="{Binding FetchedFrom}"
           IsVisible="{Binding ShowFetchedFrom}" />
 
+        <!-- Bind the active account to this server / unlink the bound one. -->
+        <Button DockPanel.Dock="Top"
+          HorizontalAlignment="Left"
+          Margin="4,0,4,4"
+          IsVisible="{Binding ShowBindAccount}"
+          Content="{Binding BindAccountText}"
+          Command="{Binding BindAccountCommand}" />
+
         <Control DockPanel.Dock="Top" Height="8" />
 
         <views:RowSideAlignedPanel>

@@ -1,23 +1,31 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Input;
+using DynamicData;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
+using Splat;
 using SS14.Launcher.Localization;
 using SS14.Launcher.Models.Data;
+using SS14.Launcher.Models.Logins;
 using SS14.Launcher.Models.ServerStatus;
+using SS14.Launcher.Utility;
 using SS14.Launcher.Views;
 using static SS14.Launcher.Utility.HubUtility;
 
 namespace SS14.Launcher.ViewModels.MainWindowTabs;
 
-public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<FavoritesChanged>, IViewModelBase
+public sealed class ServerEntryViewModel : ObservableRecipient,
+    IRecipient<FavoritesChanged>,
+    IRecipient<ServerAccountBindingsChanged>,
+    IViewModelBase
 {
     private readonly LocalizationManager _loc = LocalizationManager.Instance;
     private readonly ServerStatusData _cacheData;
     private readonly IServerSource _serverSource;
     private readonly DataManager _cfg;
+    private readonly LoginManager _loginMgr;
     private readonly MainWindowViewModel _windowVm;
     private string Address => _cacheData.Address;
     private string _fallbackName = string.Empty;
@@ -27,11 +35,13 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
     public ICommand FavoriteButtonCommand { get; }
     public ICommand FavoriteRaiseButtonCommand { get; }
     public ICommand FavoriteEditCommand { get; }
+    public ICommand BindAccountCommand { get; }
 
     public ServerEntryViewModel(MainWindowViewModel windowVm, ServerStatusData cacheData, IServerSource serverSource,
         DataManager cfg)
     {
         _cfg = cfg;
+        _loginMgr = Locator.Current.GetRequiredService<LoginManager>();
         _windowVm = windowVm;
         _cacheData = cacheData;
         _serverSource = serverSource;
@@ -39,6 +49,7 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         FavoriteButtonCommand = new RelayCommand(FavoriteButtonPressed);
         FavoriteRaiseButtonCommand = new RelayCommand(FavoriteRaiseButtonPressed);
         FavoriteEditCommand = new RelayCommand(FavoriteEditPressed);
+        BindAccountCommand = new RelayCommand(BindAccountPressed);
     }
 
     public ServerEntryViewModel(
@@ -258,6 +269,60 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         OnPropertyChanged(nameof(FavoriteButtonText));
     }
 
+    //
+    // Account binding: connecting to this server switches to the bound account automatically.
+    //
+
+    private Guid? BoundAccountId => _cfg.GetServerAccountId(Address);
+
+    /// <summary>
+    /// The button is shown if there is something to do: unlink the bound account,
+    /// or bind the account that is active right now.
+    /// </summary>
+    public bool ShowBindAccount
+        => _cfg.ActuallyMultiAccounts && (BoundAccountId != null || _loginMgr.ActiveAccount != null);
+
+    public string BindAccountText
+    {
+        get
+        {
+            if (BoundAccountId is not { } boundId)
+                return _loc.GetString("server-entry-account-bind");
+
+            var name = _loginMgr.Logins.TryLookup(boundId, out var account)
+                ? account.Username
+                : boundId.ToString();
+
+            return _loc.GetString("server-entry-account-unbind", ("name", name));
+        }
+    }
+
+    private void BindAccountPressed()
+    {
+        if (BoundAccountId != null)
+        {
+            _cfg.ClearServerAccount(Address);
+        }
+        else if (_loginMgr.ActiveAccount is { } active)
+        {
+            _cfg.SetServerAccount(Address, active.UserId);
+        }
+
+        _cfg.CommitConfig();
+    }
+
+    public void Receive(ServerAccountBindingsChanged message)
+    {
+        OnPropertyChanged(nameof(ShowBindAccount));
+        OnPropertyChanged(nameof(BindAccountText));
+    }
+
+    private void OnLoginManagerPropertyChanged(object? _, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName is nameof(LoginManager.ActiveAccount))
+            OnPropertyChanged(nameof(ShowBindAccount));
+    }
+
     private void CheckUpdateInfo()
     {
         if (!IsExpanded || _cacheData.Status != ServerStatusCode.Online)
@@ -274,6 +339,11 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         base.OnActivated();
 
         _cacheData.PropertyChanged += OnCacheDataOnPropertyChanged;
+        _loginMgr.PropertyChanged += OnLoginManagerPropertyChanged;
+
+        // The active account or the bindings may have changed while this entry was not shown.
+        OnPropertyChanged(nameof(ShowBindAccount));
+        OnPropertyChanged(nameof(BindAccountText));
     }
 
     protected override void OnDeactivated()
@@ -281,6 +351,7 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         base.OnDeactivated();
 
         _cacheData.PropertyChanged -= OnCacheDataOnPropertyChanged;
+        _loginMgr.PropertyChanged -= OnLoginManagerPropertyChanged;
     }
 
     private void OnCacheDataOnPropertyChanged(object? _, PropertyChangedEventArgs args)
