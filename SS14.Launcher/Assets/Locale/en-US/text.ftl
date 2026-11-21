@@ -422,3 +422,11 @@ language-selector-language = { $languageName } ({ $englishName })
 
 # Generic "Done!" message used for some buttons.
 button-done = Done!
+
+## Themes
+tab-options-theme = Theme
+tab-options-theme-particles = Theme particles
+tab-options-theme-particles-desc = Animated particles in themes that have them (violet). Turn off to save battery/CPU.
+theme-name-dark-gray = Dark gray
+theme-name-violet = Violet-black
+theme-name-light = Light

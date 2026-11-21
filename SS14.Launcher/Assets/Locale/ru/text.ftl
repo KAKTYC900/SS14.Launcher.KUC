@@ -570,3 +570,11 @@ main-window-intel-degrade-accept = Я понимаю и принял необх�
 main-window-rosetta-accept = Продолжить
 tab-options-clear-content-close-client = Сперва закройте запущенные клиенты
 button-done = Готово!
+
+## Themes
+tab-options-theme = Тема
+tab-options-theme-particles = Частицы темы
+tab-options-theme-particles-desc = Анимированные частицы в темах, где они есть (фиолетовая). Отключите, чтобы снизить нагрузку на процессор.
+theme-name-dark-gray = Тёмно-серая
+theme-name-violet = Фиолетово-чёрная
+theme-name-light = Светлая

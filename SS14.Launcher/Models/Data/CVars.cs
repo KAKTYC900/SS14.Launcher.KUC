@@ -119,6 +119,16 @@ public static class CVars
     public static readonly CVarDef<string?> Language = CVarDef.Create<string?>("Language", null);
 
     /// <summary>
+    /// Id of the selected launcher theme ("dark-gray", "violet", "light").
+    /// </summary>
+    public static readonly CVarDef<string> Theme = CVarDef.Create("Theme", "dark-gray");
+
+    /// <summary>
+    /// Whether animated particles are drawn in themes that have them.
+    /// </summary>
+    public static readonly CVarDef<bool> ThemeParticles = CVarDef.Create("ThemeParticles", true);
+
+    /// <summary>
     /// The CPU architecture this launcher was last run with.
     /// </summary>
     /// <remarks>
