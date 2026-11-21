@@ -38,6 +38,14 @@
     <SolidColorBrush x:Key="ThemeTabItemSelectedBrush" Color="{StaticResource ThemeTabItemSelectedColor}" />
     <SolidColorBrush x:Key="ThemeTabItemHoveredBrush" Color="{StaticResource ThemeTabItemHoveredColor}" />
 
+    <!-- Extra keys used by the theme system (ThemeManager overrides them at runtime). -->
+    <SolidColorBrush x:Key="ThemeHeaderBackgroundBrush" Color="#212126" />
+    <SolidColorBrush x:Key="ThemeButtonForegroundBrush" Color="#EEEEEE" />
+    <SolidColorBrush x:Key="ThemeButtonBackgroundBrush" Color="{StaticResource ThemeControlMidColor}" />
+    <SolidColorBrush x:Key="ThemeListBackgroundBrush" Color="#1e1e22" />
+    <SolidColorBrush x:Key="ThemeListAltRowBrush" Color="#262626" />
+    <SolidColorBrush x:Key="ThemeSeparatorBrush" Color="#2e2e35" />
+
     <sys:Double x:Key="FontSizeNormal">15</sys:Double>
 
     <VisualBrush x:Key="ThemeStripeBackBrush">

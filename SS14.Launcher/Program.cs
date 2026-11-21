@@ -22,6 +22,7 @@ using SS14.Launcher.Models.ServerStatus;
 using SS14.Launcher.Models.EngineManager;
 using SS14.Launcher.Models.Logins;
 using SS14.Launcher.Models.OverrideAssets;
+using SS14.Launcher.Models.Themes;
 using SS14.Launcher.Utility;
 using TerraFX.Interop.Windows;
 using LogEventLevel = Serilog.Events.LogEventLevel;
@@ -93,6 +94,7 @@ internal static class Program
         var cfg = new DataManager();
         cfg.Load();
         Locator.CurrentMutable.RegisterConstant(cfg);
+        Locator.CurrentMutable.RegisterConstant(new ThemeManager(cfg));
 
         CheckWindowsVersion();
         // Bad antivirus check disabled: I assume Avast/AVG fixed their shit.

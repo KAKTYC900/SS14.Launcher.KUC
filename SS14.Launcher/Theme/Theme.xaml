@@ -38,9 +38,7 @@
   </Style>
 
   <Style Selector="Panel.ScrollViewerSep">
-    <Setter Property="Background">
-      <SolidColorBrush Color="#2e2e35" />
-    </Setter>
+    <Setter Property="Background" Value="{DynamicResource ThemeSeparatorBrush}" />
     <Setter Property="MinHeight" Value="1" />
   </Style>
 

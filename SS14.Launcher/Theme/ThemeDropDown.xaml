@@ -4,7 +4,8 @@
         xmlns:views="clr-namespace:SS14.Launcher.Views">
 
   <Style Selector="views|DropDown">
-    <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}" />
+    <Setter Property="Background" Value="{DynamicResource ThemeButtonBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForegroundBrush}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
@@ -14,7 +15,7 @@
             <Grid Margin="0, 2" ColumnDefinitions="*,Auto">
               <ContentPresenter Content="{TemplateBinding HeaderContent}"
                                 ContentTemplate="{TemplateBinding HeaderContentTemplate}" />
-              <Path Grid.Column="1" Fill="{DynamicResource ThemeForegroundBrush}"
+              <Path Grid.Column="1" Fill="{DynamicResource ThemeButtonForegroundBrush}"
                     Width="8"
                     Height="4"
                     Stretch="Uniform"

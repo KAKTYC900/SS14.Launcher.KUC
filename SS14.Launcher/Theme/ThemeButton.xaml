@@ -27,6 +27,8 @@ Taken & modified from Avalonia's git repo.
 
     <Setter Property="Padding" Value="0, 2" />
     <Setter Property="Margin" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource ThemeButtonBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ThemeButtonForegroundBrush}" />
   </Style>
   <Style Selector="Button /template/ Panel#PART_Margin">
     <Setter Property="Margin" Value="14 0" />

@@ -15,6 +15,7 @@ using SS14.Launcher.Localization;
 using SS14.Launcher.Models;
 using SS14.Launcher.Models.ContentManagement;
 using SS14.Launcher.Models.OverrideAssets;
+using SS14.Launcher.Models.Themes;
 using SS14.Launcher.Utility;
 using SS14.Launcher.ViewModels;
 using SS14.Launcher.Views;
@@ -127,6 +128,9 @@ public class App : Application
         var contentManager = Locator.Current.GetRequiredService<ContentManager>();
         var overrideAssets = Locator.Current.GetRequiredService<OverrideAssetsManager>();
         var launcherInfo = Locator.Current.GetRequiredService<LauncherInfoManager>();
+
+        // Apply the saved theme before any window is created.
+        Locator.Current.GetRequiredService<ThemeManager>().Initialize();
 
         loc.Initialize();
         launcherInfo.Initialize();

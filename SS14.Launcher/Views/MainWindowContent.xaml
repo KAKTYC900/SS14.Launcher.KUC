@@ -15,10 +15,7 @@
   <Panel>
     <DockPanel LastChildFill="true">
       <!-- Header -->
-      <Panel DockPanel.Dock="Top">
-        <Panel.Background>
-          <SolidColorBrush Color="#212126" />
-        </Panel.Background>
+      <Panel DockPanel.Dock="Top" Background="{DynamicResource ThemeHeaderBackgroundBrush}">
 
         <DockPanel Name="HeaderPanel" Classes="MainWindowHeader">
           <!-- Logo -->
@@ -66,6 +63,9 @@
           DataContext="{Binding LoginViewModel}" />
       </Grid>
     </DockPanel>
+
+    <!-- Decorative particles (only visible in themes that define them) -->
+    <v:ParticleField />
 
     <ContentControl Classes="OverlayBox"
                     IsVisible="{Binding LoginViewModel.Screen.OverlayControl, Converter={x:Static ObjectConverters.IsNotNull}}">
