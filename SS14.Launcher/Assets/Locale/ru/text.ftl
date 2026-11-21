@@ -638,3 +638,12 @@ tab-options-diagnostics-desc = Собирает логи лаунчера и и�
 tab-options-diagnostics-working = Собираю данные, это может занять до 10 секунд...
 tab-options-diagnostics-done = Готово: { $path }
 tab-options-diagnostics-failed = Не удалось создать архив: { $error }
+
+## Stats overlay
+tab-options-stats-overlay = Показывать характеристики в игре
+tab-options-stats-overlay-desc = Нажмите Shift+U в игре, чтобы показать или скрыть небольшую панель в левом верхнем углу: номер раунда, имя аккаунта, режим игры и время раунда. Работает поверх игры в окне и в окне без рамки (не в полноэкранном режиме). Только Windows; вступает в силу при следующем запуске игры.
+stats-overlay-round = Раунд: №{ $id }
+stats-overlay-ckey = Сикей: { $name }
+stats-overlay-mode = Режим: { $mode }
+stats-overlay-time = Время: { $time }
+stats-overlay-lobby = лобби

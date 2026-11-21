@@ -20,6 +20,7 @@ using Splat;
 using SS14.Launcher.Models.Data;
 using SS14.Launcher.Models.EngineManager;
 using SS14.Launcher.Models.Logins;
+using SS14.Launcher.Models.Overlay;
 using SS14.Launcher.Utility;
 
 namespace SS14.Launcher.Models;
@@ -298,6 +299,10 @@ public partial class Connector : ObservableObject
                 Status = ConnectionStatus.ClientRunning;
 
                 // The game is up: remember the session, and note when it ends.
+                var statsOverlay = Locator.Current.GetRequiredService<GameStatsOverlayManager>();
+                if (_historyAddress != null)
+                    statsOverlay.Start(clientProc, _historyAddress);
+
                 var historyEntry = _historyAddress != null ? _cfg.AddConnectionHistory(_historyAddress) : null;
                 if (historyEntry != null)
                     _cfg.CommitConfig();
@@ -308,6 +313,8 @@ public partial class Connector : ObservableObject
                 }
                 finally
                 {
+                    statsOverlay.Stop(clientProc);
+
                     if (historyEntry != null)
                     {
                         _cfg.FinishConnectionHistory(historyEntry);

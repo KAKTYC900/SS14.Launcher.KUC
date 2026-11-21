@@ -115,6 +115,12 @@
                    Text="{loc:Loc tab-options-seasonal-branding-desc}"
                    Margin="8" />
 
+        <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding StatsOverlay}"
+                  IsVisible="{Binding StatsOverlaySupported}" Content="{loc:Loc tab-options-stats-overlay}" />
+        <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" IsVisible="{Binding StatsOverlaySupported}"
+                   Text="{loc:Loc tab-options-stats-overlay-desc}"
+                   Margin="8" />
+
         <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding PrefetchFavoriteServers}" Content="{loc:Loc tab-options-prefetch-favorites}" />
         <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                    Text="{loc:Loc tab-options-prefetch-favorites-desc}"
