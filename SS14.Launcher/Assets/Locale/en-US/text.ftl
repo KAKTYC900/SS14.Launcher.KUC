@@ -490,3 +490,12 @@ tab-options-diagnostics-desc = Packs launcher and game logs, system info and a n
 tab-options-diagnostics-working = Collecting data, this can take up to 10 seconds...
 tab-options-diagnostics-done = Done: { $path }
 tab-options-diagnostics-failed = Could not create the archive: { $error }
+
+## Stats overlay
+tab-options-stats-overlay = Show stats in game
+tab-options-stats-overlay-desc = Press Shift+U in the game to show or hide a small panel in the top left corner with the round number, your account name, game mode and round time. Works over windowed and borderless games (not exclusive fullscreen). Windows only; takes effect the next time you start the game.
+stats-overlay-round = Round: #{ $id }
+stats-overlay-ckey = Account: { $name }
+stats-overlay-mode = Mode: { $mode }
+stats-overlay-time = Time: { $time }
+stats-overlay-lobby = lobby

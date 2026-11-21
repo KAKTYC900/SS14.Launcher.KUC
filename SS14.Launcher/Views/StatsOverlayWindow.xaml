@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:SS14.Launcher.Views"
+        x:Class="SS14.Launcher.Views.StatsOverlayWindow"
+        Title="SS14 Launcher stats"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        CanResize="False"
+        Focusable="False"
+        SizeToContent="WidthAndHeight"
+        Background="Transparent">
+  <!-- Colors come from the launcher theme, so the panel always matches the selected theme. -->
+  <Panel Opacity="0.94">
+    <views:AngleBox Fill="{DynamicResource ThemePopupBackgroundBrush}"
+                    Stroke="{DynamicResource ThemeStripebackEdgeBrush}" StrokeThickness="1"
+                    CornerSize="10" />
+    <StackPanel Margin="14 8 18 10" Spacing="2">
+      <TextBlock Text="{Binding RoundText}" Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+      <TextBlock Text="{Binding CkeyText}" Foreground="{DynamicResource ThemeForegroundBrush}" />
+      <TextBlock Text="{Binding ModeText}" Foreground="{DynamicResource ThemeForegroundBrush}" />
+      <TextBlock Text="{Binding TimeText}" Foreground="{DynamicResource ThemeForegroundBrush}" />
+    </StackPanel>
+  </Panel>
+</Window>

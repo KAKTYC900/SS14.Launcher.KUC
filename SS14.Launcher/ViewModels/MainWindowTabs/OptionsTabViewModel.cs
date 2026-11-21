@@ -8,6 +8,7 @@ using SS14.Launcher.Localization;
 using SS14.Launcher.Models.ContentManagement;
 using SS14.Launcher.Models.Data;
 using SS14.Launcher.Models.EngineManager;
+using SS14.Launcher.Models.Overlay;
 using SS14.Launcher.Models.Themes;
 using SS14.Launcher.Utility;
 
@@ -144,6 +145,18 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.OverrideAssets, value);
+            Cfg.CommitConfig();
+        }
+    }
+
+    public bool StatsOverlaySupported => GameStatsOverlayManager.IsSupported;
+
+    public bool StatsOverlay
+    {
+        get => Cfg.GetCVar(CVars.StatsOverlay);
+        set
+        {
+            Cfg.SetCVar(CVars.StatsOverlay, value);
             Cfg.CommitConfig();
         }
     }
