@@ -21,6 +21,13 @@
               HorizontalAlignment="Left" Click="ClearServerContentPressed" />
       <Button Content="{loc:Loc tab-options-open-log-directory}" DockPanel.Dock="Bottom" HorizontalAlignment="Left"
               Command="{Binding OpenLogDirectory}"/>
+      <StackPanel DockPanel.Dock="Bottom" Margin="0 4">
+        <Button Content="{loc:Loc tab-options-diagnostics}" HorizontalAlignment="Left"
+                Command="{Binding CreateDiagnostics}" IsEnabled="{Binding !DiagnosticsBusy}" />
+        <TextBlock TextWrapping="Wrap" Classes="SubText" Margin="8 2" Text="{loc:Loc tab-options-diagnostics-desc}" />
+        <TextBlock TextWrapping="Wrap" Margin="8 2" Text="{Binding DiagnosticsStatus}"
+                   IsVisible="{Binding DiagnosticsStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
 
       <StackPanel Orientation="Vertical">
         <views:LanguageSelector HorizontalAlignment="Left" Margin="4" DataContext="{Binding Language}"

@@ -43,6 +43,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
     public HomePageViewModel HomeTab { get; }
     public FavoritesTabViewModel FavoritesTab { get; }
     public ServerListTabViewModel ServersTab { get; }
+    public NotificationsTabViewModel NotificationsTab { get; }
+    public HistoryTabViewModel HistoryTab { get; }
     public NewsTabViewModel NewsTab { get; }
     public OptionsTabViewModel OptionsTab { get; }
 
@@ -58,6 +60,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         NewsTab = new NewsTabViewModel();
         HomeTab = new HomePageViewModel(this);
         FavoritesTab = new FavoritesTabViewModel(this);
+        NotificationsTab = new NotificationsTabViewModel();
+        HistoryTab = new HistoryTabViewModel(this);
         OptionsTab = new OptionsTabViewModel();
 
         Tabs = new List<MainWindowTabViewModel>
@@ -65,6 +69,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
             HomeTab,
             FavoritesTab,
             ServersTab,
+            NotificationsTab,
+            HistoryTab,
             NewsTab,
             OptionsTab,
 #if DEVELOPMENT

@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:notif="clr-namespace:SS14.Launcher.Models.Notifications"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.NotificationsTabView">
+  <DockPanel>
+    <!-- Header: title, master switches, test -->
+    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="4, 0, 4, 2">
+      <TextBlock DockPanel.Dock="Left" Text="{loc:Loc tab-notifications-title}" Classes="NanoHeadingMedium" />
+      <Button DockPanel.Dock="Right" Content="{loc:Loc tab-notifications-test}" Command="{Binding TestPressed}" />
+      <CheckBox DockPanel.Dock="Right" Margin="0 0 8 0" IsChecked="{Binding SystemNotifications}"
+                Content="{loc:Loc tab-notifications-system}" />
+      <CheckBox DockPanel.Dock="Right" Margin="0 0 8 0" IsChecked="{Binding NotificationsEnabled}"
+                Content="{loc:Loc tab-notifications-enabled}" />
+    </DockPanel>
+
+    <Panel DockPanel.Dock="Top" Classes="ScrollViewerSep" />
+
+    <!-- Add server -->
+    <StackPanel DockPanel.Dock="Top" Margin="4 6 4 2">
+      <DockPanel>
+        <Button DockPanel.Dock="Right" Content="{loc:Loc tab-notifications-add}" Command="{Binding AddPressed}" />
+        <TextBox Text="{Binding NewAddress}" Watermark="{loc:Loc tab-notifications-address-watermark}"
+                 Margin="0 0 4 0" />
+      </DockPanel>
+      <TextBlock Text="{Binding AddError}" Foreground="{DynamicResource ThemeNanoGoldBrush}"
+                 IsVisible="{Binding AddError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <TextBlock Classes="SubText" TextWrapping="Wrap" Margin="0 4 0 0" Text="{loc:Loc tab-notifications-note}" />
+    </StackPanel>
+
+    <Panel DockPanel.Dock="Top" Classes="ScrollViewerSep" Margin="0 4 0 0" />
+
+    <Panel>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding !IsEmpty}">
+        <ItemsControl ItemsSource="{Binding Servers}" Classes="ServerList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="notif:WatchedServer">
+              <Grid ColumnDefinitions="*,Auto" Margin="8 6">
+                <StackPanel Grid.Column="0" Spacing="2">
+                  <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Address}" Classes="SubText" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding StatusText}" Classes="SubText" />
+
+                  <WrapPanel Orientation="Horizontal" Margin="0 4 0 0">
+                    <CheckBox IsChecked="{Binding NotifyRoundStart}" Margin="0 0 12 0"
+                              Content="{loc:Loc tab-notifications-round-start}" />
+                    <CheckBox IsChecked="{Binding NotifyOnlineChange}" Margin="0 0 12 0"
+                              Content="{loc:Loc tab-notifications-online-change}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock Text="{loc:Loc tab-notifications-threshold}" VerticalAlignment="Center" />
+                      <NumericUpDown Value="{Binding PlayerThreshold}" Minimum="0" Maximum="999"
+                                     Increment="1" FormatString="0" Width="110" />
+                    </StackPanel>
+                  </WrapPanel>
+                </StackPanel>
+
+                <Button Grid.Column="1" VerticalAlignment="Top"
+                        Content="{loc:Loc tab-notifications-remove}"
+                        Click="RemoveClicked" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <TextBlock IsVisible="{Binding IsEmpty}" Text="{loc:Loc tab-notifications-empty}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Panel>
+  </DockPanel>
+</UserControl>

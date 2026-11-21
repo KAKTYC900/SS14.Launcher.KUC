@@ -128,6 +128,15 @@ public static class CVars
     /// </summary>
     public static readonly CVarDef<string> FavoriteCardLayout = CVarDef.Create("FavoriteCardLayout", "");
 
+    /// <summary>Servers watched by the Notifications tab, as JSON (see WatchedServerDto).</summary>
+    public static readonly CVarDef<string> WatchedServers = CVarDef.Create("WatchedServers", "[]");
+
+    /// <summary>Master switch for server notifications.</summary>
+    public static readonly CVarDef<bool> NotificationsEnabled = CVarDef.Create("NotificationsEnabled", true);
+
+    /// <summary>Use operating system notifications when the launcher window is not in front.</summary>
+    public static readonly CVarDef<bool> NotificationsSystem = CVarDef.Create("NotificationsSystem", true);
+
     // Custom theme sliders: hue 0-360, saturation 0-100.
     public static readonly CVarDef<int> CustomBaseHue = CVarDef.Create("CustomThemeBaseHue", 262);
     public static readonly CVarDef<int> CustomBaseSat = CVarDef.Create("CustomThemeBaseSat", 80);

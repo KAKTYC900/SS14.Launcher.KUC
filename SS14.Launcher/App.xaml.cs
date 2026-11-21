@@ -15,6 +15,7 @@ using SS14.Launcher.Localization;
 using SS14.Launcher.Models;
 using SS14.Launcher.Models.ContentManagement;
 using SS14.Launcher.Models.OverrideAssets;
+using SS14.Launcher.Models.Notifications;
 using SS14.Launcher.Models.Themes;
 using SS14.Launcher.Utility;
 using SS14.Launcher.ViewModels;
@@ -133,6 +134,7 @@ public class App : Application
         Locator.Current.GetRequiredService<ThemeManager>().Initialize();
 
         loc.Initialize();
+        Locator.Current.GetRequiredService<ServerWatcher>().Initialize();
         launcherInfo.Initialize();
         contentManager.Initialize();
         overrideAssets.Initialize();
