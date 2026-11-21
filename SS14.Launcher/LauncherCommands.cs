@@ -42,8 +42,12 @@ public class LauncherCommands
         var reason = _reason == "" ? null : _reason;
         // Sanity-check the connection.
 
+        // A server with a bound account gets that account picked in StartConnect,
+        // so there is no need to wait here for some account to be active.
+        var accountBound = _windowVm.Cfg.GetServerAccountId(param) != null;
+
         LoggedInAccount? activeAccount = null;
-        while (true)
+        while (!accountBound)
         {
             activeAccount = _loginMgr.ActiveAccount;
 
@@ -63,7 +67,7 @@ public class LauncherCommands
             return;
         }
 
-        if (activeAccount!.Status != AccountLoginStatus.Available)
+        if (!accountBound && activeAccount!.Status != AccountLoginStatus.Available)
         {
             Log.Warning($"Dropping connect command: Account not available");
             return;

@@ -265,6 +265,69 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         }
     }
 
+    /// <summary>
+    /// Makes sure that the account bound to the given server (if any) is the active one before connecting.
+    /// </summary>
+    /// <returns>
+    /// True if the connection can go ahead: the server has no bound account, or the bound account is now active.
+    /// False if the connection should not start, because the bound account needs to log in again
+    /// or could not be checked. The user is told about it in that case.
+    /// </returns>
+    public async Task<bool> EnsureAccountForServerAsync(string address)
+    {
+        if (_cfg.GetServerAccountId(address) is not { } boundId)
+            return true;
+
+        // Binding to an account we no longer have is cleaned up when the login is removed.
+        // If it still happens, just connect with whichever account is active.
+        if (!_loginMgr.Logins.TryLookup(boundId, out var account))
+            return true;
+
+        if (_loginMgr.ActiveAccountId == boundId)
+            return true;
+
+        Log.Information("Server {Address} is bound to account {Account}, switching to it", address, account.LoginInfo);
+
+        if (account.Status == AccountLoginStatus.Unsure)
+        {
+            BusyTask = _loc.GetString("main-window-busy-checking-account-status");
+            try
+            {
+                await _loginMgr.UpdateSingleAccountStatus(account);
+            }
+            catch (AuthApiException e)
+            {
+                Log.Warning(e, "AuthApiException while trying to refresh account {login}", account.LoginInfo);
+                OverlayViewModel = new AuthErrorsOverlayViewModel(this, _loc.GetString("main-window-error-connecting-auth-server"),
+                    new[]
+                    {
+                        e.InnerException?.Message ?? _loc.GetString("main-window-error-unknown")
+                    });
+                return false;
+            }
+            finally
+            {
+                BusyTask = null;
+            }
+        }
+
+        switch (account.Status)
+        {
+            case AccountLoginStatus.Available:
+                _loginMgr.ActiveAccount = account;
+                return true;
+
+            case AccountLoginStatus.Expired:
+                // Token is dead, the user has to log in again. Show the same screen as when switching manually.
+                _loginMgr.ActiveAccount = null;
+                LoginViewModel.SwitchToExpiredLogin(account);
+                return false;
+
+            default:
+                return false;
+        }
+    }
+
     public void OverlayOk()
     {
         OverlayViewModel = null;

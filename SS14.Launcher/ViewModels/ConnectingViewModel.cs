@@ -210,8 +210,13 @@ public class ConnectingViewModel : ViewModelBase
         ? _loc.GetString("connecting-privacy-policy-text-version-changed")
         : _loc.GetString("connecting-privacy-policy-text");
 
-    public static void StartConnect(MainWindowViewModel windowVm, string address, string? givenReason = null)
+    // async void so that existing callers (which never awaited this) keep working as before.
+    // If the server has an account bound to it, the launcher switches to that account first.
+    public static async void StartConnect(MainWindowViewModel windowVm, string address, string? givenReason = null)
     {
+        if (!await windowVm.EnsureAccountForServerAsync(address))
+            return;
+
         var connector = new Connector();
         var vm = new ConnectingViewModel(connector, windowVm, givenReason, ConnectionType.Server);
         windowVm.ConnectingVM = vm;

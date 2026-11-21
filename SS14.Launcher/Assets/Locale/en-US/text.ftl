@@ -347,6 +347,8 @@ server-entry-status-lobby = Lobby
 server-fetched-from-hub = Fetched from { $hub }
 server-entry-raise = Raise to top
 server-entry-edit = Edit
+server-entry-account-bind = Always use the current account on this server
+server-entry-account-unbind = Account for this server: { $name } (click to unlink)
 
 ## Strings for the "Development" tab
 ## These aren't shown to users so they're not very important

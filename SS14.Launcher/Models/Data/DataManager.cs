@@ -64,6 +64,9 @@ public sealed class DataManager : ObservableObject
     // Privacy policy IDs accepted along with the last accepted version.
     private readonly Dictionary<string, string> _acceptedPrivacyPolicies = new();
 
+    // Accounts bound to servers: normalized server address -> user ID of the account to connect with.
+    private readonly Dictionary<string, Guid> _serverAccounts = new();
+
     static DataManager()
     {
         SqlMapper.AddTypeHandler(new GuidTypeHandler());
@@ -231,6 +234,91 @@ public sealed class DataManager : ObservableObject
         {
             SelectedLoginId = null;
         }
+
+        RemoveServerAccountsOf(loginInfo.UserId);
+    }
+
+    /// <summary>
+    /// Turns a server address as typed by the user, shown in the server list or passed in a link
+    /// (<c>ss14://host:1212/</c>, <c>host</c>, <c>HOST:1212</c>...) into the key used for account bindings.
+    /// </summary>
+    /// <remarks>
+    /// Two spellings of the same host and port give the same key.
+    /// The scheme and path are ignored.
+    /// </remarks>
+    public static string NormalizeServerAddress(string address)
+    {
+        if (!UriHelper.TryParseSs14Uri(address.Trim(), out var uri))
+            return address.Trim().TrimEnd('/').ToLowerInvariant();
+
+        var port = uri.Port;
+        if (port < 0 || uri.IsDefaultPort)
+            port = uri.Scheme == UriHelper.SchemeSs14 ? Global.DefaultServerPort : 443;
+
+        return $"{uri.Host.ToLowerInvariant()}:{port}";
+    }
+
+    /// <summary>
+    /// Gets the user ID of the account bound to the given server, or null if the server has no bound account.
+    /// </summary>
+    public Guid? GetServerAccountId(string address)
+    {
+        return _serverAccounts.TryGetValue(NormalizeServerAddress(address), out var userId)
+            ? userId
+            : null;
+    }
+
+    /// <summary>
+    /// Binds an account to a server. Connecting to the server will then switch to this account.
+    /// </summary>
+    /// <exception cref="ArgumentException">We are not logged in for that user ID.</exception>
+    public void SetServerAccount(string address, Guid userId)
+    {
+        if (!_logins.Lookup(userId).HasValue)
+            throw new ArgumentException("We are not logged in for that user ID.");
+
+        var key = NormalizeServerAddress(address);
+        _serverAccounts[key] = userId;
+
+        AddDbCommand(con => con.Execute(
+            "INSERT OR REPLACE INTO ServerAccountBinding (Address, UserId) VALUES (@Address, @UserId)",
+            new { Address = key, UserId = userId }));
+
+        WeakReferenceMessenger.Default.Send(new ServerAccountBindingsChanged());
+    }
+
+    /// <summary>
+    /// Removes the account binding of a server, if there is one.
+    /// </summary>
+    public void ClearServerAccount(string address)
+    {
+        var key = NormalizeServerAddress(address);
+        if (!_serverAccounts.Remove(key))
+            return;
+
+        AddDbCommand(con => con.Execute(
+            "DELETE FROM ServerAccountBinding WHERE Address = @Address",
+            new { Address = key }));
+
+        WeakReferenceMessenger.Default.Send(new ServerAccountBindingsChanged());
+    }
+
+    private void RemoveServerAccountsOf(Guid userId)
+    {
+        var keys = _serverAccounts.Where(p => p.Value == userId).Select(p => p.Key).ToArray();
+        if (keys.Length == 0)
+            return;
+
+        foreach (var key in keys)
+        {
+            _serverAccounts.Remove(key);
+        }
+
+        AddDbCommand(con => con.Execute(
+            "DELETE FROM ServerAccountBinding WHERE UserId = @UserId",
+            new { UserId = userId }));
+
+        WeakReferenceMessenger.Default.Send(new ServerAccountBindingsChanged());
     }
 
     /// <summary>
@@ -364,6 +452,12 @@ public sealed class DataManager : ObservableObject
                      "SELECT Identifier, Version FROM AcceptedPrivacyPolicy"))
         {
             _acceptedPrivacyPolicies[identifier] = version;
+        }
+
+        foreach (var (address, userId) in sqliteConnection.Query<(string, Guid)>(
+                     "SELECT Address, UserId FROM ServerAccountBinding"))
+        {
+            _serverAccounts[address] = userId;
         }
 
         // Avoid DB commands from config load.
@@ -672,3 +766,8 @@ public sealed class DataManager : ObservableObject
 }
 
 public record FavoritesChanged;
+
+/// <summary>
+/// Sent when an account was bound to, or unbound from, a server.
+/// </summary>
+public record ServerAccountBindingsChanged;
