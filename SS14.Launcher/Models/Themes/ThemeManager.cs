@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
+using Avalonia.Threading;
 using Serilog;
 using SS14.Launcher.Models.Data;
 
@@ -29,16 +30,54 @@ public sealed class ThemeManager
 
     public bool ParticlesEnabled => _cfg.GetCVar(CVars.ThemeParticles);
 
+    private DispatcherTimer? _commitTimer;
+
     public void Initialize()
     {
-        Apply(ThemePalettes.Get(_cfg.GetCVar(CVars.Theme)));
+        Apply(Resolve(_cfg.GetCVar(CVars.Theme)));
     }
 
     public void SetTheme(string id)
     {
         _cfg.SetCVar(CVars.Theme, id);
         _cfg.CommitConfig();
-        Apply(ThemePalettes.Get(id));
+        Apply(Resolve(id));
+    }
+
+    private ThemeDefinition Resolve(string? id)
+    {
+        return id == ThemePalettes.Custom ? ThemePalettes.BuildCustom(GetCustom()) : ThemePalettes.Get(id);
+    }
+
+    public ThemePalettes.CustomParams GetCustom() => new(
+        _cfg.GetCVar(CVars.CustomBaseHue), _cfg.GetCVar(CVars.CustomBaseSat),
+        _cfg.GetCVar(CVars.CustomGradientHue), _cfg.GetCVar(CVars.CustomGradientSat),
+        _cfg.GetCVar(CVars.CustomParticleHue), _cfg.GetCVar(CVars.CustomParticleSat));
+
+    /// <summary>Stores new custom colors and re-applies the custom theme live (disk write is debounced while dragging sliders).</summary>
+    public void SetCustom(ThemePalettes.CustomParams p)
+    {
+        _cfg.SetCVar(CVars.CustomBaseHue, p.BaseHue);
+        _cfg.SetCVar(CVars.CustomBaseSat, p.BaseSat);
+        _cfg.SetCVar(CVars.CustomGradientHue, p.GradientHue);
+        _cfg.SetCVar(CVars.CustomGradientSat, p.GradientSat);
+        _cfg.SetCVar(CVars.CustomParticleHue, p.ParticleHue);
+        _cfg.SetCVar(CVars.CustomParticleSat, p.ParticleSat);
+
+        if (Current.Id == ThemePalettes.Custom)
+            Apply(ThemePalettes.BuildCustom(p));
+
+        _commitTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(600) };
+        _commitTimer.Tick -= OnCommitTick;
+        _commitTimer.Tick += OnCommitTick;
+        _commitTimer.Stop();
+        _commitTimer.Start();
+    }
+
+    private void OnCommitTick(object? sender, EventArgs e)
+    {
+        _commitTimer?.Stop();
+        _cfg.CommitConfig();
     }
 
     public void SetParticles(bool enabled)

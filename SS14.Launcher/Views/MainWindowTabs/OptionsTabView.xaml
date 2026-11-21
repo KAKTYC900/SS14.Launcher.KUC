@@ -34,6 +34,48 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <!-- Custom theme color sliders -->
+        <StackPanel IsVisible="{Binding IsCustomThemeSelected}" Margin="8 4" Spacing="2">
+          <TextBlock Text="{loc:Loc theme-custom-base}" />
+          <Grid ColumnDefinitions="90,*,40">
+            <TextBlock Text="{loc:Loc theme-custom-hue}" VerticalAlignment="Center" Classes="SubText" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="360" Value="{Binding CustomBaseHue}" />
+            <TextBlock Grid.Column="2" Text="{Binding CustomBaseHue}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+          </Grid>
+          <Grid ColumnDefinitions="90,*,40">
+            <TextBlock Text="{loc:Loc theme-custom-saturation}" VerticalAlignment="Center" Classes="SubText" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding CustomBaseSat}" />
+            <TextBlock Grid.Column="2" Text="{Binding CustomBaseSat}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+          </Grid>
+
+          <TextBlock Text="{loc:Loc theme-custom-gradient}" Margin="0 6 0 0" />
+          <Grid ColumnDefinitions="90,*,40">
+            <TextBlock Text="{loc:Loc theme-custom-hue}" VerticalAlignment="Center" Classes="SubText" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="360" Value="{Binding CustomGradientHue}" />
+            <TextBlock Grid.Column="2" Text="{Binding CustomGradientHue}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+          </Grid>
+          <Grid ColumnDefinitions="90,*,40">
+            <TextBlock Text="{loc:Loc theme-custom-saturation}" VerticalAlignment="Center" Classes="SubText" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding CustomGradientSat}" />
+            <TextBlock Grid.Column="2" Text="{Binding CustomGradientSat}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+          </Grid>
+
+          <TextBlock Text="{loc:Loc theme-custom-particles}" Margin="0 6 0 0" />
+          <Grid ColumnDefinitions="90,*,40">
+            <TextBlock Text="{loc:Loc theme-custom-hue}" VerticalAlignment="Center" Classes="SubText" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="360" Value="{Binding CustomParticleHue}" />
+            <TextBlock Grid.Column="2" Text="{Binding CustomParticleHue}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+          </Grid>
+          <Grid ColumnDefinitions="90,*,40">
+            <TextBlock Text="{loc:Loc theme-custom-saturation}" VerticalAlignment="Center" Classes="SubText" />
+            <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding CustomParticleSat}" />
+            <TextBlock Grid.Column="2" Text="{Binding CustomParticleSat}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+          </Grid>
+
+          <Button Content="{loc:Loc theme-custom-reset}" Command="{Binding ResetCustomTheme}"
+                  HorizontalAlignment="Left" Margin="0 6 0 0" />
+        </StackPanel>
+
         <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding ThemeParticles}"
                   Content="{loc:Loc tab-options-theme-particles}" />
         <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"

@@ -99,7 +99,110 @@ public static class ThemePalettes
         Separator = C("#D5DCEA"),
     };
 
-    public static readonly ThemeDefinition[] All = [DarkGrayTheme, VioletTheme, LightTheme];
+    public const string Custom = "custom";
+
+    /// <summary>Hue is 0-360, saturation 0-100, for the three independently adjustable colors.</summary>
+    public readonly record struct CustomParams(
+        int BaseHue, int BaseSat, int GradientHue, int GradientSat, int ParticleHue, int ParticleSat)
+    {
+        public static readonly CustomParams Default = new(262, 80, 262, 80, 262, 90);
+    }
+
+    public static readonly ThemeDefinition CustomTheme = BuildCustom(CustomParams.Default);
+
+    public static readonly ThemeDefinition[] All = [DarkGrayTheme, VioletTheme, LightTheme, CustomTheme];
+
+    /// <summary>Builds a violet-style dark theme where the base, gradient and particle colors come from sliders.</summary>
+    public static ThemeDefinition BuildCustom(CustomParams p)
+    {
+        double bh = p.BaseHue, bs = p.BaseSat / 100.0;
+        double gh = p.GradientHue, gs = p.GradientSat / 100.0;
+        double ph = p.ParticleHue, ps = p.ParticleSat / 100.0;
+
+        var hovered = Control(bh, bs * 0.6, 0.46);
+        var mid = Control(bh, bs * 0.55, 0.38);
+
+        return new ThemeDefinition
+        {
+            Id = Custom,
+            NameKey = "theme-name-custom",
+            Colors = new Dictionary<string, Color>
+            {
+                ["ThemeBackground"] = Hsl(bh, bs * 0.45, 0.07),
+                ["ThemePopupBackground"] = Hsl(bh, bs * 0.5, 0.05),
+                ["ThemeForeground"] = Hsl(bh, bs * 0.5, 0.94),
+                ["ThemeForegroundMuted"] = Hsl(bh, bs * 0.2, 0.70),
+                ["ThemeControlMid"] = mid,
+                ["ThemeControlHigh"] = Control(bh, bs * 0.8, 0.52),
+                ["ThemeNanoGold"] = Hsl(bh, bs * 0.9, 0.72),
+                ["ThemeSubText"] = Hsl(bh, bs * 0.15, 0.70),
+                ["ThemeStripebackEdge"] = Hsl(bh, bs * 0.4, 0.22),
+                ["ThemeButtonHovered"] = hovered,
+                ["ThemeTabItemSelected"] = WithAlpha(hovered, 0xCC),
+                ["ThemeTabItemHovered"] = WithAlpha(mid, 0xAA),
+                ["ThemeListSeparator"] = WithAlpha(Hsl(bh, bs * 0.5, 0.28), 0xAA),
+                ["ThemeListSeparatorTransparent"] = WithAlpha(Hsl(bh, bs * 0.5, 0.28), 0),
+            },
+            ButtonGradient = (Control(gh, gs * 0.8, 0.30), Control(gh, gs, 0.48)),
+            TabStripe = (Hsl(bh, bs * 0.45, 0.045), Hsl(bh, bs * 0.45, 0.08)),
+            ParticleColor = Hsl(ph, ps, 0.72),
+            ListBackground = Hsl(bh, bs * 0.45, 0.06),
+            ListAltRow = Hsl(bh, bs * 0.45, 0.09),
+            HeaderBackground = Hsl(bh, bs * 0.45, 0.05),
+            Separator = Hsl(bh, bs * 0.45, 0.17),
+        };
+    }
+
+    private static Color WithAlpha(Color c, byte a) => Color.FromArgb(a, c.R, c.G, c.B);
+
+    /// <summary>A button-ish color that is darkened until white text on it is readable (matters for yellow/green hues).</summary>
+    private static Color Control(double h, double s, double l)
+    {
+        var c = Hsl(h, s, l);
+        while (l > 0.1 && ContrastWithWhite(c) < 4.5)
+        {
+            l -= 0.02;
+            c = Hsl(h, s, l);
+        }
+
+        return c;
+    }
+
+    private static double ContrastWithWhite(Color c)
+    {
+        static double Lin(byte v)
+        {
+            var x = v / 255.0;
+            return x <= 0.03928 ? x / 12.92 : System.Math.Pow((x + 0.055) / 1.055, 2.4);
+        }
+
+        var lum = 0.2126 * Lin(c.R) + 0.7152 * Lin(c.G) + 0.0722 * Lin(c.B);
+        return 1.05 / (lum + 0.05);
+    }
+
+    private static Color Hsl(double h, double s, double l)
+    {
+        h = ((h % 360) + 360) % 360;
+        s = System.Math.Clamp(s, 0, 1);
+        l = System.Math.Clamp(l, 0, 1);
+
+        var c = (1 - System.Math.Abs(2 * l - 1)) * s;
+        var x = c * (1 - System.Math.Abs(h / 60 % 2 - 1));
+        var m = l - c / 2;
+        (double r, double g, double b) = (int)(h / 60) switch
+        {
+            0 => (c, x, 0.0),
+            1 => (x, c, 0.0),
+            2 => (0.0, c, x),
+            3 => (0.0, x, c),
+            4 => (x, 0.0, c),
+            _ => (c, 0.0, x),
+        };
+
+        return Color.FromRgb((byte)System.Math.Round((r + m) * 255),
+            (byte)System.Math.Round((g + m) * 255),
+            (byte)System.Math.Round((b + m) * 255));
+    }
 
     public static ThemeDefinition Get(string? id)
     {

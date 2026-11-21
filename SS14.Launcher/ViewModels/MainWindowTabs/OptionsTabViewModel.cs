@@ -32,10 +32,66 @@ public class OptionsTabViewModel : MainWindowTabViewModel
 
         _themeManager = Locator.Current.GetRequiredService<ThemeManager>();
         Themes = ThemePalettes.All
-            .Select(t => new ThemeOptionViewModel(_themeManager, t))
+            .Select(t => new ThemeOptionViewModel(_themeManager, t,
+                () => OnPropertyChanged(nameof(IsCustomThemeSelected))))
             .ToArray();
 
         DisableIncompatibleMacOS = OperatingSystem.IsMacOS();
+    }
+
+    public bool IsCustomThemeSelected => _themeManager.Current.Id == ThemePalettes.Custom;
+
+    private void UpdateCustom(Func<ThemePalettes.CustomParams, ThemePalettes.CustomParams> change, string prop)
+    {
+        _themeManager.SetCustom(change(_themeManager.GetCustom()));
+        OnPropertyChanged(prop);
+    }
+
+    public double CustomBaseHue
+    {
+        get => _themeManager.GetCustom().BaseHue;
+        set => UpdateCustom(c => c with { BaseHue = (int)value }, nameof(CustomBaseHue));
+    }
+
+    public double CustomBaseSat
+    {
+        get => _themeManager.GetCustom().BaseSat;
+        set => UpdateCustom(c => c with { BaseSat = (int)value }, nameof(CustomBaseSat));
+    }
+
+    public double CustomGradientHue
+    {
+        get => _themeManager.GetCustom().GradientHue;
+        set => UpdateCustom(c => c with { GradientHue = (int)value }, nameof(CustomGradientHue));
+    }
+
+    public double CustomGradientSat
+    {
+        get => _themeManager.GetCustom().GradientSat;
+        set => UpdateCustom(c => c with { GradientSat = (int)value }, nameof(CustomGradientSat));
+    }
+
+    public double CustomParticleHue
+    {
+        get => _themeManager.GetCustom().ParticleHue;
+        set => UpdateCustom(c => c with { ParticleHue = (int)value }, nameof(CustomParticleHue));
+    }
+
+    public double CustomParticleSat
+    {
+        get => _themeManager.GetCustom().ParticleSat;
+        set => UpdateCustom(c => c with { ParticleSat = (int)value }, nameof(CustomParticleSat));
+    }
+
+    public void ResetCustomTheme()
+    {
+        _themeManager.SetCustom(ThemePalettes.CustomParams.Default);
+        OnPropertyChanged(nameof(CustomBaseHue));
+        OnPropertyChanged(nameof(CustomBaseSat));
+        OnPropertyChanged(nameof(CustomGradientHue));
+        OnPropertyChanged(nameof(CustomGradientSat));
+        OnPropertyChanged(nameof(CustomParticleHue));
+        OnPropertyChanged(nameof(CustomParticleSat));
     }
 
     public bool ThemeParticles
@@ -122,10 +178,13 @@ public sealed class ThemeOptionViewModel : ObservableObject
     private readonly ThemeManager _manager;
     private readonly ThemeDefinition _theme;
 
-    public ThemeOptionViewModel(ThemeManager manager, ThemeDefinition theme)
+    private readonly Action _onSelected;
+
+    public ThemeOptionViewModel(ThemeManager manager, ThemeDefinition theme, Action onSelected)
     {
         _manager = manager;
         _theme = theme;
+        _onSelected = onSelected;
     }
 
     public string Name => LocalizationManager.Instance.GetString(_theme.NameKey);
@@ -141,6 +200,7 @@ public sealed class ThemeOptionViewModel : ObservableObject
 
             _manager.SetTheme(_theme.Id);
             OnPropertyChanged();
+            _onSelected();
         }
     }
 }
