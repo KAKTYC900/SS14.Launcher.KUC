@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -15,6 +16,20 @@ public partial class OptionsTabView : UserControl
     public OptionsTabView()
     {
         InitializeComponent();
+
+        // Tunnel: see the key before the button itself reacts to Space/Enter.
+        StatsKeyButton.AddHandler(KeyDownEvent, OnStatsKeyDown, RoutingStrategies.Tunnel);
+    }
+
+    private void OnStatsKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is OptionsTabViewModel { IsCapturingKey: true } vm && vm.TryCaptureKey(e.Key, e.KeyModifiers))
+            e.Handled = true;
+    }
+
+    private void StatsKeyLostFocus(object? sender, RoutedEventArgs e)
+    {
+        (DataContext as OptionsTabViewModel)?.CancelKeyCapture();
     }
 
     private void Flip(object? o, RoutedEventArgs routedEventArgs)

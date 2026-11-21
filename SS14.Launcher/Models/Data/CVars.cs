@@ -131,6 +131,12 @@ public static class CVars
     /// <summary>Shift+U in the game shows a stats panel (round, account, game mode, round time).</summary>
     public static readonly CVarDef<bool> StatsOverlay = CVarDef.Create("StatsOverlay", false);
 
+    /// <summary>Key that toggles the stats panel: Windows virtual-key code (default U).</summary>
+    public static readonly CVarDef<int> StatsOverlayVk = CVarDef.Create("StatsOverlayVk", 0x55);
+
+    /// <summary>Modifiers of the stats panel key: 1 = Shift, 2 = Ctrl, 4 = Alt (default Shift).</summary>
+    public static readonly CVarDef<int> StatsOverlayMods = CVarDef.Create("StatsOverlayMods", 1);
+
     /// <summary>Servers watched by the Notifications tab, as JSON (see WatchedServerDto).</summary>
     public static readonly CVarDef<string> WatchedServers = CVarDef.Create("WatchedServers", "[]");
 

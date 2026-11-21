@@ -36,7 +36,6 @@ public sealed class GameStatsOverlayManager
     private const int VkShift = 0x10;
     private const int VkControl = 0x11;
     private const int VkMenu = 0x12;
-    private const int VkU = 0x55;
 
     private static readonly TimeSpan StatusInterval = TimeSpan.FromSeconds(10);
 
@@ -50,7 +49,9 @@ public sealed class GameStatsOverlayManager
 
     private IntPtr _hook;
     private HookProc? _hookProc; // Must be kept referenced, or the GC collects the delegate under the hook.
-    private bool _uDown;
+    private volatile int _hotkeyVk = OverlayHotkey.DefaultVk;
+    private volatile int _hotkeyMods = OverlayHotkey.DefaultMods;
+    private bool _keyDown;
 
     private DispatcherTimer? _timer;
     private StatsOverlayWindow? _window;
@@ -116,6 +117,8 @@ public sealed class GameStatsOverlayManager
         _runLevel = null;
         _roundStart = null;
 
+        LoadHotkey();
+
         _hookProc = HookCallback;
         _hook = SetWindowsHookEx(WhKeyboardLl, _hookProc, GetModuleHandle(null), 0);
         if (_hook == IntPtr.Zero)
@@ -166,20 +169,22 @@ public sealed class GameStatsOverlayManager
                 var vk = Marshal.ReadInt32(lParam);
                 var msg = (int)wParam;
 
-                if (vk == VkU && msg == WmKeyUp)
+                if (vk == _hotkeyVk && msg == WmKeyUp)
                 {
-                    _uDown = false;
+                    _keyDown = false;
                 }
-                else if (vk == VkU && msg == WmKeyDown && !_uDown)
+                else if (vk == _hotkeyVk && msg == WmKeyDown && !_keyDown)
                 {
                     // Auto-repeat sends KeyDown again and again while the key is held; react once per press.
-                    _uDown = true;
+                    _keyDown = true;
 
-                    var shift = (GetAsyncKeyState(VkShift) & 0x8000) != 0;
-                    var ctrl = (GetAsyncKeyState(VkControl) & 0x8000) != 0;
-                    var alt = (GetAsyncKeyState(VkMenu) & 0x8000) != 0;
+                    var mods = 0;
+                    if ((GetAsyncKeyState(VkShift) & 0x8000) != 0) mods |= OverlayHotkey.ModShift;
+                    if ((GetAsyncKeyState(VkControl) & 0x8000) != 0) mods |= OverlayHotkey.ModCtrl;
+                    if ((GetAsyncKeyState(VkMenu) & 0x8000) != 0) mods |= OverlayHotkey.ModAlt;
 
-                    if (shift && !ctrl && !alt && IsGameInFront())
+                    // Modifiers must match exactly, so Shift+U does not also fire for Ctrl+Shift+U.
+                    if (mods == _hotkeyMods && IsGameInFront())
                         Dispatcher.UIThread.Post(Toggle);
                 }
             }
@@ -201,6 +206,13 @@ public sealed class GameStatsOverlayManager
 
         GetWindowThreadProcessId(fg, out var pid);
         return pid == (uint)_gamePid;
+    }
+
+    /// <summary>Reads the configured key. Called regularly, so a change in the settings applies immediately.</summary>
+    private void LoadHotkey()
+    {
+        _hotkeyVk = _cfg.GetCVar(CVars.StatsOverlayVk);
+        _hotkeyMods = _cfg.GetCVar(CVars.StatsOverlayMods);
     }
 
     private void Toggle()
@@ -231,6 +243,8 @@ public sealed class GameStatsOverlayManager
             StopCore();
             return;
         }
+
+        LoadHotkey();
 
         var fg = GetForegroundWindow();
         GetWindowThreadProcessId(fg, out var fgPid);
