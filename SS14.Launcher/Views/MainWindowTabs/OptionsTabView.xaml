@@ -121,6 +121,14 @@
                    Text="{loc:Loc tab-options-stats-overlay-desc}"
                    Margin="8" />
 
+        <StackPanel Orientation="Horizontal" Spacing="6" Margin="4" IsVisible="{Binding StatsOverlaySupported}">
+          <TextBlock Text="{loc:Loc tab-options-stats-overlay-key}" VerticalAlignment="Center" />
+          <Button Name="StatsKeyButton" MinWidth="150" HorizontalContentAlignment="Center"
+                  Content="{Binding StatsOverlayKeyText}" Command="{Binding BeginKeyCapture}"
+                  LostFocus="StatsKeyLostFocus" />
+          <Button Content="{loc:Loc tab-options-stats-overlay-key-reset}" Command="{Binding ResetKey}" />
+        </StackPanel>
+
         <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding PrefetchFavoriteServers}" Content="{loc:Loc tab-options-prefetch-favorites}" />
         <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                    Text="{loc:Loc tab-options-prefetch-favorites-desc}"

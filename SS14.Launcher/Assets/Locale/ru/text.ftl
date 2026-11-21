@@ -641,9 +641,12 @@ tab-options-diagnostics-failed = Не удалось создать архив: 
 
 ## Stats overlay
 tab-options-stats-overlay = Показывать характеристики в игре
-tab-options-stats-overlay-desc = Нажмите Shift+U в игре, чтобы показать или скрыть небольшую панель в левом верхнем углу: номер раунда, имя аккаунта, режим игры и время раунда. Работает поверх игры в окне и в окне без рамки (не в полноэкранном режиме). Только Windows; вступает в силу при следующем запуске игры.
+tab-options-stats-overlay-desc = Нажмите выбранную клавишу в игре (по умолчанию Shift+U), чтобы показать или скрыть небольшую панель в левом верхнем углу: номер раунда, имя аккаунта, режим игры и время раунда. Работает поверх игры в окне и в окне без рамки (не в полноэкранном режиме). Только Windows; вступает в силу при следующем запуске игры.
 stats-overlay-round = Раунд: №{ $id }
 stats-overlay-ckey = Сикей: { $name }
 stats-overlay-mode = Режим: { $mode }
 stats-overlay-time = Время: { $time }
 stats-overlay-lobby = лобби
+tab-options-stats-overlay-key = Клавиша:
+tab-options-stats-overlay-key-press = Нажмите клавишу...
+tab-options-stats-overlay-key-reset = Сбросить

@@ -161,6 +161,68 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         }
     }
 
+    private bool _capturingKey;
+
+    public bool IsCapturingKey => _capturingKey;
+
+    /// <summary>Text of the key button: the current key, or a prompt while waiting for a key press.</summary>
+    public string StatsOverlayKeyText => _capturingKey
+        ? LocalizationManager.Instance.GetString("tab-options-stats-overlay-key-press")
+        : OverlayHotkey.Format(Cfg.GetCVar(CVars.StatsOverlayVk), Cfg.GetCVar(CVars.StatsOverlayMods));
+
+    public void BeginKeyCapture()
+    {
+        _capturingKey = true;
+        OnPropertyChanged(nameof(StatsOverlayKeyText));
+    }
+
+    public void CancelKeyCapture()
+    {
+        if (!_capturingKey)
+            return;
+
+        _capturingKey = false;
+        OnPropertyChanged(nameof(StatsOverlayKeyText));
+    }
+
+    /// <summary>Handles a key press while capturing. Returns true if the key press was used.</summary>
+    public bool TryCaptureKey(Avalonia.Input.Key key, Avalonia.Input.KeyModifiers modifiers)
+    {
+        if (!_capturingKey)
+            return false;
+
+        // Wait for the actual key: pressing only Shift/Ctrl/Alt is the start of a combination.
+        if (OverlayHotkey.IsModifierKey(key))
+            return true;
+
+        if (key == Avalonia.Input.Key.Escape)
+        {
+            CancelKeyCapture();
+            return true;
+        }
+
+        if (OverlayHotkey.TryMapKey(key, out var vk))
+        {
+            Cfg.SetCVar(CVars.StatsOverlayVk, vk);
+            Cfg.SetCVar(CVars.StatsOverlayMods, OverlayHotkey.ModsFromAvalonia(modifiers));
+            Cfg.CommitConfig();
+            _capturingKey = false;
+            OnPropertyChanged(nameof(StatsOverlayKeyText));
+        }
+
+        // Unsupported keys are ignored; the prompt stays so the user can press another one.
+        return true;
+    }
+
+    public void ResetKey()
+    {
+        Cfg.SetCVar(CVars.StatsOverlayVk, OverlayHotkey.DefaultVk);
+        Cfg.SetCVar(CVars.StatsOverlayMods, OverlayHotkey.DefaultMods);
+        Cfg.CommitConfig();
+        _capturingKey = false;
+        OnPropertyChanged(nameof(StatsOverlayKeyText));
+    }
+
     private bool _diagnosticsBusy;
     private string _diagnosticsStatus = "";
 
