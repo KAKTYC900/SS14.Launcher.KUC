@@ -32,7 +32,12 @@ public sealed partial class WatchedServer : ObservableObject
 
     public string DisplayName => string.IsNullOrWhiteSpace(ServerName) ? Address : ServerName;
 
-    partial void OnServerNameChanged(string? value) => OnPropertyChanged(nameof(DisplayName));
+    public partial void OnServerNameChanged(string? value);
+
+    public partial void OnServerNameChanged(string? value)
+    {
+        OnPropertyChanged(nameof(DisplayName));
+    }
 }
 
 /// <summary>What gets stored in the config.</summary>

@@ -32,7 +32,8 @@ public sealed class ServerWatcher
 
     private readonly DataManager _cfg;
     private readonly Dictionary<WatchedServer, WatchState> _states = new();
-    private readonly LocalizationManager _loc = LocalizationManager.Instance;
+    // Not a field initializer: the localization manager is registered after this class is created in Program.Main.
+    private static LocalizationManager _loc => LocalizationManager.Instance;
 
     private HttpClient? _http;
     private DispatcherTimer? _timer;
