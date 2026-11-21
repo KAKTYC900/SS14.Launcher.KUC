@@ -123,6 +123,14 @@ public static class CVars
     /// </summary>
     public static readonly CVarDef<string> Theme = CVarDef.Create("Theme", "dark-gray");
 
+    // Custom theme sliders: hue 0-360, saturation 0-100.
+    public static readonly CVarDef<int> CustomBaseHue = CVarDef.Create("CustomThemeBaseHue", 262);
+    public static readonly CVarDef<int> CustomBaseSat = CVarDef.Create("CustomThemeBaseSat", 80);
+    public static readonly CVarDef<int> CustomGradientHue = CVarDef.Create("CustomThemeGradientHue", 262);
+    public static readonly CVarDef<int> CustomGradientSat = CVarDef.Create("CustomThemeGradientSat", 80);
+    public static readonly CVarDef<int> CustomParticleHue = CVarDef.Create("CustomThemeParticleHue", 262);
+    public static readonly CVarDef<int> CustomParticleSat = CVarDef.Create("CustomThemeParticleSat", 90);
+
     /// <summary>
     /// Whether animated particles are drawn in themes that have them.
     /// </summary>
