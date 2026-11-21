@@ -123,6 +123,11 @@ public static class CVars
     /// </summary>
     public static readonly CVarDef<string> Theme = CVarDef.Create("Theme", "dark-gray");
 
+    /// <summary>
+    /// Positions of the cards in the Favorites tab: lines of "address TAB x TAB y".
+    /// </summary>
+    public static readonly CVarDef<string> FavoriteCardLayout = CVarDef.Create("FavoriteCardLayout", "");
+
     // Custom theme sliders: hue 0-360, saturation 0-100.
     public static readonly CVarDef<int> CustomBaseHue = CVarDef.Create("CustomThemeBaseHue", 262);
     public static readonly CVarDef<int> CustomBaseSat = CVarDef.Create("CustomThemeBaseSat", 80);

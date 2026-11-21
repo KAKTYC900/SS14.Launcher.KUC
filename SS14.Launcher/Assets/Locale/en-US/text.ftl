@@ -437,3 +437,17 @@ theme-custom-particles = Particles
 theme-custom-hue = Hue
 theme-custom-saturation = Saturation
 theme-custom-reset = Reset colors
+
+## Favorites tab
+tab-favorites-title = Favorites
+tab-favorites-add = Add server
+tab-favorites-refresh = Refresh
+tab-favorites-reset-layout = Arrange in grid
+tab-favorites-empty = No servers here yet. Add one with the plus button.
+tab-favorites-hint = Drag cards to arrange them however you like.
+favorites-card-mode = Game mode
+favorites-card-ping = Ping
+favorites-card-players = Players
+favorites-card-round = Round time
+favorites-card-remove = Remove from favorites
+favorites-ping-value = { $ms } ms

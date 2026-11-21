@@ -151,6 +151,9 @@ public sealed class ServerEntryViewModel : ObservableRecipient,
 
     public DateTime? RoundStartTime => _cacheData.RoundStartTime;
 
+    /// <summary>Current game mode, or a dash if the server doesn't report one.</summary>
+    public string PresetString => string.IsNullOrWhiteSpace(_cacheData.Preset) ? "—" : _cacheData.Preset;
+
     public string RoundStatusString =>
         _cacheData.RoundStatus == GameRoundStatus.InLobby
             ? _loc.GetString("server-entry-status-lobby")
@@ -366,6 +369,10 @@ public sealed class ServerEntryViewModel : ObservableRecipient,
 
             case nameof(IServerStatusData.RoundStartTime):
                 OnPropertyChanged(nameof(RoundStartTime));
+                break;
+
+            case nameof(ServerStatusData.Preset):
+                OnPropertyChanged(nameof(PresetString));
                 break;
 
             case nameof(IServerStatusData.RoundStatus):

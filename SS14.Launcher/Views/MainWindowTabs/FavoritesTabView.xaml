@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             xmlns:v="clr-namespace:SS14.Launcher.Views"
+             xmlns:mwt="clr-namespace:SS14.Launcher.Views.MainWindowTabs"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.FavoritesTabView">
+  <Design.DataContext>
+    <mainWindowTabs:FavoritesTabViewModel />
+  </Design.DataContext>
+
+  <UserControl.Styles>
+    <!-- Cards are placed freely on a Canvas using their X/Y. -->
+    <Style Selector="ItemsControl.CardCanvas > ContentPresenter">
+      <Setter Property="Canvas.Left" Value="{Binding X}" />
+      <Setter Property="Canvas.Top" Value="{Binding Y}" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel>
+    <!-- Header controls -->
+    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="4, 0, 4, 2">
+      <TextBlock DockPanel.Dock="Left" Text="{loc:Loc tab-favorites-title}" Classes="NanoHeadingMedium" />
+      <TextBlock DockPanel.Dock="Left" Text="{loc:Loc tab-favorites-hint}" Classes="SubText"
+                 VerticalAlignment="Center" Margin="12 0 0 0" />
+      <Button DockPanel.Dock="Right" Classes="OpenLeft" Command="{Binding AddFavoritePressed}"
+              ToolTip.Tip="{loc:Loc tab-favorites-add}">
+        <v:IconLabel Icon="{DynamicResource ButtonIcon-plus}" Height="20" Width="20" />
+      </Button>
+      <Button DockPanel.Dock="Right" Classes="OpenBoth" Command="{Binding RefreshPressed}"
+              ToolTip.Tip="{loc:Loc tab-favorites-refresh}">
+        <v:IconLabel Icon="{DynamicResource ButtonIcon-refresh}" Height="20" Width="20" />
+      </Button>
+      <Button DockPanel.Dock="Right" Classes="OpenRight" Command="{Binding ResetLayoutPressed}"
+              Content="{loc:Loc tab-favorites-reset-layout}" />
+    </DockPanel>
+
+    <Panel DockPanel.Dock="Top" Classes="ScrollViewerSep" />
+
+    <Panel>
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                    IsVisible="{Binding !CardsEmpty}">
+        <ItemsControl Classes="CardCanvas" ItemsSource="{Binding Cards}"
+                      MinWidth="{Binding CanvasWidth}" MinHeight="{Binding CanvasHeight}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="mainWindowTabs:FavoriteCardViewModel">
+              <mwt:FavoriteCardView />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <TextBlock IsVisible="{Binding CardsEmpty}" Text="{loc:Loc tab-favorites-empty}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Panel>
+  </DockPanel>
+</UserControl>

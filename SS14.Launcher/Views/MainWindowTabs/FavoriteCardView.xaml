@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:controls="clr-namespace:SS14.Launcher.Controls"
+             xmlns:views="clr-namespace:SS14.Launcher.Views"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="176"
+             Width="250" Height="176"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.FavoriteCardView">
+  <Design.DataContext>
+    <mainWindowTabs:FavoriteCardViewModel />
+  </Design.DataContext>
+
+  <!-- Transparent background so the whole card (not only its children) can be grabbed and dragged. -->
+  <Panel Name="Root" Background="Transparent" Cursor="SizeAll">
+    <views:AngleBox Fill="{DynamicResource ThemePopupBackgroundBrush}"
+                    Stroke="{DynamicResource ThemeStripebackEdgeBrush}" StrokeThickness="1"
+                    CornerSize="12" />
+
+    <DockPanel Margin="12 8 12 10">
+      <!-- Connect -->
+      <Button DockPanel.Dock="Bottom" Classes="OpenBoth" Margin="0 8 0 0"
+              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+              IsEnabled="{Binding Entry.IsOnline}"
+              Content="{loc:Loc server-entry-connect}"
+              Command="{Binding Entry.ConnectCommand}" />
+
+      <!-- Title + remove -->
+      <DockPanel DockPanel.Dock="Top">
+        <Button DockPanel.Dock="Right" Classes="OpenBoth" Padding="4 2" Margin="4 0 0 0"
+                ToolTip.Tip="{loc:Loc favorites-card-remove}"
+                Command="{Binding Entry.FavoriteButtonCommand}">
+          <views:IconLabel Icon="/Assets/cross.png" Height="14" Width="14" />
+        </Button>
+        <TextBlock Text="{Binding Entry.Name}" Classes="NanoHeadingSmall"
+                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+      </DockPanel>
+
+      <!-- Info rows -->
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0 8 0 0">
+        <TextBlock Grid.Row="0" Classes="SubText" Text="{loc:Loc favorites-card-mode}" Margin="0 0 10 4" />
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Entry.PresetString}"
+                   TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
+
+        <TextBlock Grid.Row="1" Classes="SubText" Text="{loc:Loc favorites-card-ping}" Margin="0 0 10 4" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PingText}" HorizontalAlignment="Right" />
+
+        <TextBlock Grid.Row="2" Classes="SubText" Text="{loc:Loc favorites-card-players}" Margin="0 0 10 4" />
+        <Panel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right">
+          <TextBlock Text="{Binding Entry.PlayerCountString}" IsVisible="{Binding Entry.HaveData}" />
+          <TextBlock Text="{Binding Entry.ServerStatusString}" IsVisible="{Binding !Entry.HaveData}" />
+        </Panel>
+
+        <TextBlock Grid.Row="3" Classes="SubText" Text="{loc:Loc favorites-card-round}" Margin="0 0 10 4" />
+        <Panel Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" IsVisible="{Binding Entry.HaveData}">
+          <controls:TimerTextCell Value="{Binding Entry.RoundStartTime}"
+                                  IsVisible="{Binding Entry.RoundStatusString, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+          <TextBlock Text="{Binding Entry.RoundStatusString}"
+                     IsVisible="{Binding Entry.RoundStatusString, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </Panel>
+      </Grid>
+    </DockPanel>
+  </Panel>
+</UserControl>

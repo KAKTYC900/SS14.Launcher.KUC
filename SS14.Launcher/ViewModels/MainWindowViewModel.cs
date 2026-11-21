@@ -41,6 +41,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
     private IDisposable? _warningCountdownTimer;
 
     public HomePageViewModel HomeTab { get; }
+    public FavoritesTabViewModel FavoritesTab { get; }
     public ServerListTabViewModel ServersTab { get; }
     public NewsTabViewModel NewsTab { get; }
     public OptionsTabViewModel OptionsTab { get; }
@@ -56,11 +57,13 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         ServersTab = new ServerListTabViewModel(this);
         NewsTab = new NewsTabViewModel();
         HomeTab = new HomePageViewModel(this);
+        FavoritesTab = new FavoritesTabViewModel(this);
         OptionsTab = new OptionsTabViewModel();
 
         Tabs = new List<MainWindowTabViewModel>
         {
             HomeTab,
+            FavoritesTab,
             ServersTab,
             NewsTab,
             OptionsTab,
