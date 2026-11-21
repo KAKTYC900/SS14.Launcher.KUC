@@ -39,6 +39,9 @@ public partial class Connector : ObservableObject
 
     private TaskCompletionSource<PrivacyPolicyAcceptResult>? _acceptPrivacyPolicyTcs;
 
+    // Address of the server we connect to, for the connection history. Null for content bundles.
+    private string? _historyAddress;
+
     [ObservableProperty] private ConnectionStatus _status = ConnectionStatus.None;
     [ObservableProperty] private bool _clientExitedBadly;
     [ObservableProperty] private bool _privacyPolicyDifferentVersion;
@@ -108,6 +111,7 @@ public partial class Connector : ObservableObject
 
         var connectAddress = GetConnectAddress(info, infoAddr);
 
+        _historyAddress = address;
         await LaunchClientWrap(installation, info, info.BuildInformation, connectAddress, parsedAddr, false, cancel);
     }
 
@@ -292,7 +296,25 @@ public partial class Connector : ObservableObject
             if (!clientProc.HasExited)
             {
                 Status = ConnectionStatus.ClientRunning;
-                await waitClient;
+
+                // The game is up: remember the session, and note when it ends.
+                var historyEntry = _historyAddress != null ? _cfg.AddConnectionHistory(_historyAddress) : null;
+                if (historyEntry != null)
+                    _cfg.CommitConfig();
+
+                try
+                {
+                    await waitClient;
+                }
+                finally
+                {
+                    if (historyEntry != null)
+                    {
+                        _cfg.FinishConnectionHistory(historyEntry);
+                        _cfg.CommitConfig();
+                    }
+                }
+
                 return;
             }
 

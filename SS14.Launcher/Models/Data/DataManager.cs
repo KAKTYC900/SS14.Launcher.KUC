@@ -43,6 +43,10 @@ public sealed class DataManager : ObservableObject
 
     private readonly SourceCache<FavoriteServer, string> _favoriteServers = new(f => f.Address);
 
+    // Oldest first.
+    private readonly List<ConnectionHistoryEntry> _connectionHistory = new();
+    private const int MaxConnectionHistoryEntries = 200;
+
     private readonly SourceCache<LoginInfo, Guid> _logins = new(l => l.UserId);
 
     // When using dynamic engine management, this is used to keep track of installed engine versions.
@@ -153,6 +157,58 @@ public sealed class DataManager : ObservableObject
         }
 
         _favoriteServers.AddOrUpdate(server);
+    }
+
+    /// <summary>Game sessions started from the launcher, oldest first.</summary>
+    public IReadOnlyList<ConnectionHistoryEntry> ConnectionHistory => _connectionHistory;
+
+    /// <summary>Records that a game session with this server has started.</summary>
+    public ConnectionHistoryEntry AddConnectionHistory(string address)
+    {
+        var fav = _favoriteServers.Lookup(address);
+        var entry = new ConnectionHistoryEntry
+        {
+            Id = Guid.NewGuid(),
+            Address = address,
+            Name = fav.HasValue ? fav.Value.Name : null,
+            Start = DateTimeOffset.UtcNow,
+        };
+
+        _connectionHistory.Add(entry);
+        AddDbCommand(con => con.Execute(
+            "INSERT INTO ConnectionHistory (Id, Address, Name, StartTime) VALUES (@Id, @Address, @Name, @Start)",
+            new { Id = entry.Id.ToString(), entry.Address, entry.Name, Start = entry.Start.ToUnixTimeSeconds() }));
+
+        while (_connectionHistory.Count > MaxConnectionHistoryEntries)
+        {
+            var oldest = _connectionHistory[0];
+            _connectionHistory.RemoveAt(0);
+            AddDbCommand(con => con.Execute(
+                "DELETE FROM ConnectionHistory WHERE Id = @Id",
+                new { Id = oldest.Id.ToString() }));
+        }
+
+        WeakReferenceMessenger.Default.Send(new ConnectionHistoryChanged());
+        return entry;
+    }
+
+    /// <summary>Records that a game session has ended.</summary>
+    public void FinishConnectionHistory(ConnectionHistoryEntry entry)
+    {
+        entry.End = DateTimeOffset.UtcNow;
+        AddDbCommand(con => con.Execute(
+            "UPDATE ConnectionHistory SET EndTime = @End WHERE Id = @Id",
+            new { Id = entry.Id.ToString(), End = entry.End.Value.ToUnixTimeSeconds() }));
+
+        WeakReferenceMessenger.Default.Send(new ConnectionHistoryChanged());
+    }
+
+    public void ClearConnectionHistory()
+    {
+        _connectionHistory.Clear();
+        AddDbCommand(con => con.Execute("DELETE FROM ConnectionHistory"));
+
+        WeakReferenceMessenger.Default.Send(new ConnectionHistoryChanged());
     }
 
     public void RemoveFavoriteServer(FavoriteServer server)
@@ -458,6 +514,22 @@ public sealed class DataManager : ObservableObject
                      "SELECT Address, UserId FROM ServerAccountBinding"))
         {
             _serverAccounts[address] = userId;
+        }
+
+        foreach (var (id, address, name, start, end) in sqliteConnection.Query<(string, string, string?, long, long?)>(
+                     "SELECT Id, Address, Name, StartTime, EndTime FROM ConnectionHistory ORDER BY StartTime"))
+        {
+            if (!Guid.TryParse(id, out var guid))
+                continue;
+
+            _connectionHistory.Add(new ConnectionHistoryEntry
+            {
+                Id = guid,
+                Address = address,
+                Name = name,
+                Start = DateTimeOffset.FromUnixTimeSeconds(start),
+                End = end is { } e ? DateTimeOffset.FromUnixTimeSeconds(e) : null,
+            });
         }
 
         // Avoid DB commands from config load.
@@ -771,3 +843,8 @@ public record FavoritesChanged;
 /// Sent when an account was bound to, or unbound from, a server.
 /// </summary>
 public record ServerAccountBindingsChanged;
+
+/// <summary>
+/// Sent when the connection history changed.
+/// </summary>
+public record ConnectionHistoryChanged;

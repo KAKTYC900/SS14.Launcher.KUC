@@ -599,3 +599,42 @@ favorites-card-players = Игроки
 favorites-card-round = Время раунда
 favorites-card-remove = Убрать из избранного
 favorites-ping-value = { $ms } мс
+
+## Notifications tab
+tab-notifications-title = Оповещения
+tab-notifications-enabled = Включить оповещения
+tab-notifications-system = Системные уведомления
+tab-notifications-test = Проверка
+tab-notifications-add = Добавить
+tab-notifications-remove = Убрать
+tab-notifications-address-watermark = Адрес сервера, например ss14://example.com:1212
+tab-notifications-note = Оповещения работают, пока запущен лаунчер (окно может быть свёрнуто, а игра запущена). Системные уведомления показываются, когда лаунчер не на переднем плане.
+tab-notifications-empty = Серверов пока нет. Добавьте те, о которых хотите получать оповещения.
+tab-notifications-round-start = Новый раунд
+tab-notifications-online-change = Сервер включился/выключился
+tab-notifications-threshold = Игроков не меньше (0 — выкл.)
+tab-notifications-error-invalid = Это не похоже на адрес сервера.
+tab-notifications-error-duplicate = Этот сервер уже есть в списке.
+notifications-test-title = Тестовое уведомление
+notifications-test-body = Если вы это видите, оповещения работают.
+notifications-round-started = Начался новый раунд.
+notifications-players-reached = Игроков: { $count } (порог { $threshold }).
+notifications-server-online = Сервер включился.
+notifications-server-offline = Сервер выключился.
+notifications-status-online = Онлайн, игроков: { $players }
+notifications-status-offline = Выключен или недоступен
+
+## History tab
+tab-history-title = История
+tab-history-clear = Очистить историю
+tab-history-reconnect = Подключиться
+tab-history-empty = Игр пока нет. Серверы, на которых вы играли, появятся здесь.
+history-duration-hours = { $hours } ч { $mins } мин
+history-duration-mins = { $mins } мин
+
+## Diagnostics
+tab-options-diagnostics = Создать диагностический архив
+tab-options-diagnostics-desc = Собирает логи лаунчера и игры, сведения о системе и проверку сети в один zip-файл на рабочем столе, чтобы отправить в поддержку. В нём нет пароля и токенов входа, но в логах могут быть адреса серверов.
+tab-options-diagnostics-working = Собираю данные, это может занять до 10 секунд...
+tab-options-diagnostics-done = Готово: { $path }
+tab-options-diagnostics-failed = Не удалось создать архив: { $error }

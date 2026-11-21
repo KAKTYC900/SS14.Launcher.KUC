@@ -148,6 +148,47 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         }
     }
 
+    private bool _diagnosticsBusy;
+    private string _diagnosticsStatus = "";
+
+    public bool DiagnosticsBusy
+    {
+        get => _diagnosticsBusy;
+        private set => SetProperty(ref _diagnosticsBusy, value);
+    }
+
+    public string DiagnosticsStatus
+    {
+        get => _diagnosticsStatus;
+        private set => SetProperty(ref _diagnosticsStatus, value);
+    }
+
+    /// <summary>Packs logs, system info and a network check into a zip on the desktop and shows it.</summary>
+    public async void CreateDiagnostics()
+    {
+        if (DiagnosticsBusy)
+            return;
+
+        var loc = LocalizationManager.Instance;
+        DiagnosticsBusy = true;
+        DiagnosticsStatus = loc.GetString("tab-options-diagnostics-working");
+        try
+        {
+            var path = await DiagnosticsExporter.CreateAsync();
+            DiagnosticsStatus = loc.GetString("tab-options-diagnostics-done", ("path", path));
+            DiagnosticsExporter.Reveal(path);
+        }
+        catch (Exception e)
+        {
+            Serilog.Log.Error(e, "Failed to create diagnostics archive");
+            DiagnosticsStatus = loc.GetString("tab-options-diagnostics-failed", ("error", e.Message));
+        }
+        finally
+        {
+            DiagnosticsBusy = false;
+        }
+    }
+
     public void ClearEngines()
     {
         _engineManager.ClearAllEngines();

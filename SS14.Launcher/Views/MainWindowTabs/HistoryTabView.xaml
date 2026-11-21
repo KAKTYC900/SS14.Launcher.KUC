@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.HistoryTabView">
+  <DockPanel>
+    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="4, 0, 4, 2">
+      <TextBlock DockPanel.Dock="Left" Text="{loc:Loc tab-history-title}" Classes="NanoHeadingMedium" />
+      <Button DockPanel.Dock="Right" Content="{loc:Loc tab-history-clear}"
+              Command="{Binding ClearPressed}" IsEnabled="{Binding !IsEmpty}" />
+    </DockPanel>
+
+    <Panel DockPanel.Dock="Top" Classes="ScrollViewerSep" />
+
+    <Panel>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding !IsEmpty}">
+        <ItemsControl ItemsSource="{Binding Items}" Classes="ServerList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="mainWindowTabs:HistoryItemViewModel">
+              <Grid ColumnDefinitions="*,150,100,112" Margin="8 4">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Address}" Classes="SubText" TextTrimming="CharacterEllipsis"
+                             IsVisible="{Binding Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding StartText}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding DurationText}" VerticalAlignment="Center" />
+                <Button Grid.Column="3" Content="{loc:Loc tab-history-reconnect}"
+                        Command="{Binding ConnectPressed}" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <TextBlock IsVisible="{Binding IsEmpty}" Text="{loc:Loc tab-history-empty}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Panel>
+  </DockPanel>
+</UserControl>

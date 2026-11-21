@@ -451,3 +451,42 @@ favorites-card-players = Players
 favorites-card-round = Round time
 favorites-card-remove = Remove from favorites
 favorites-ping-value = { $ms } ms
+
+## Notifications tab
+tab-notifications-title = Alerts
+tab-notifications-enabled = Enable alerts
+tab-notifications-system = System notifications
+tab-notifications-test = Test
+tab-notifications-add = Add
+tab-notifications-remove = Remove
+tab-notifications-address-watermark = Server address, e.g. ss14://example.com:1212
+tab-notifications-note = Alerts work while the launcher is running (the window may be minimized or the game running). System notifications are shown when the launcher is not in front.
+tab-notifications-empty = No servers yet. Add the ones you want alerts for.
+tab-notifications-round-start = New round
+tab-notifications-online-change = Server online/offline
+tab-notifications-threshold = Players at least (0 = off)
+tab-notifications-error-invalid = That doesn't look like a server address.
+tab-notifications-error-duplicate = This server is already in the list.
+notifications-test-title = Test notification
+notifications-test-body = If you can see this, alerts work.
+notifications-round-started = A new round has started.
+notifications-players-reached = Players: { $count } (threshold { $threshold }).
+notifications-server-online = The server is online.
+notifications-server-offline = The server went offline.
+notifications-status-online = Online, players: { $players }
+notifications-status-offline = Offline or not reachable
+
+## History tab
+tab-history-title = History
+tab-history-clear = Clear history
+tab-history-reconnect = Connect
+tab-history-empty = No games yet. Servers you play on will appear here.
+history-duration-hours = { $hours } h { $mins } min
+history-duration-mins = { $mins } min
+
+## Diagnostics
+tab-options-diagnostics = Create diagnostics archive
+tab-options-diagnostics-desc = Packs launcher and game logs, system info and a network check into one zip on your desktop, to send to support. It does not contain your password or login tokens, but logs may contain server addresses.
+tab-options-diagnostics-working = Collecting data, this can take up to 10 seconds...
+tab-options-diagnostics-done = Done: { $path }
+tab-options-diagnostics-failed = Could not create the archive: { $error }
