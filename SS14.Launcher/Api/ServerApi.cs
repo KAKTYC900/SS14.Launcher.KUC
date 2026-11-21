@@ -15,7 +15,9 @@ public static class ServerApi
         int SoftMaxPlayerCount,
         [property: JsonPropertyName("round_start_time")] string? RoundStartTime,
         [property: JsonPropertyName("run_level")] GameRunLevel? RunLevel,
-        [property: JsonPropertyName("tags")] string[]? Tags);
+        [property: JsonPropertyName("tags")] string[]? Tags,
+        // Current game mode (preset). Sent by Space Station 14 content servers, may be missing on others.
+        [property: JsonPropertyName("preset")] string? Preset = null);
 
     public enum GameRunLevel
     {

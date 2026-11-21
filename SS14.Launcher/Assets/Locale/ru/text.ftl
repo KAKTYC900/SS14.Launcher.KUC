@@ -585,3 +585,17 @@ theme-custom-particles = Частицы
 theme-custom-hue = Оттенок
 theme-custom-saturation = Насыщенность
 theme-custom-reset = Сбросить цвета
+
+## Favorites tab
+tab-favorites-title = Избранное
+tab-favorites-add = Добавить сервер
+tab-favorites-refresh = Обновить
+tab-favorites-reset-layout = Расставить по сетке
+tab-favorites-empty = Здесь пока нет серверов. Добавьте сервер кнопкой с плюсом.
+tab-favorites-hint = Перетаскивайте карточки, чтобы расположить их как вам удобно.
+favorites-card-mode = Режим игры
+favorites-card-ping = Пинг
+favorites-card-players = Игроки
+favorites-card-round = Время раунда
+favorites-card-remove = Убрать из избранного
+favorites-ping-value = { $ms } мс

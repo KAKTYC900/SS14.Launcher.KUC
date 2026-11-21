@@ -17,6 +17,7 @@ public sealed class ServerStatusData : ObservableObject, IServerStatusData
     private ServerStatusInfoCode _statusInfo = ServerStatusInfoCode.NotFetched;
     private ServerInfoLink[]? _links;
     private string[] _tags = Array.Empty<string>();
+    private string? _preset;
 
     public ServerStatusData(string address)
     {
@@ -95,6 +96,13 @@ public sealed class ServerStatusData : ObservableObject, IServerStatusData
     {
         get => _links;
         set => SetProperty(ref _links, value);
+    }
+
+    /// <summary>Current game mode as reported by the server's status API (may be null).</summary>
+    public string? Preset
+    {
+        get => _preset;
+        set => SetProperty(ref _preset, value);
     }
 
     public string[] Tags
