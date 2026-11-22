@@ -6,12 +6,14 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Media.Immutable;
 using Avalonia.Threading;
 using Serilog;
 using Splat;
 using SS14.Launcher.Localization;
 using SS14.Launcher.Models.Data;
 using SS14.Launcher.Models.Logins;
+using SS14.Launcher.Models.ServerStatus;
 using SS14.Launcher.Utility;
 using SS14.Launcher.ViewModels;
 using SS14.Launcher.Views;
@@ -65,6 +67,20 @@ public sealed class GameStatsOverlayManager
     private string? _preset;
     private int? _runLevel;
     private DateTime? _roundStart;
+    private int? _players;
+    private int? _softMax;
+    private string? _map;
+    private bool _panicBunker;
+
+    // Ping: recent successful samples (ms) to get a baseline for spike detection.
+    private static readonly TimeSpan PingInterval = TimeSpan.FromSeconds(5);
+    private const int PingHistory = 10;
+    private readonly System.Collections.Generic.List<int> _pingSamples = new();
+    private DateTime _lastPing = DateTime.MinValue;
+    private bool _pinging;
+    private int? _lastPingMs;
+    private bool _pingFailed;
+    private bool _pingSpike;
 
     public GameStatsOverlayManager(DataManager cfg)
     {
@@ -116,6 +132,14 @@ public sealed class GameStatsOverlayManager
         _roundId = _preset = null;
         _runLevel = null;
         _roundStart = null;
+        _players = _softMax = null;
+        _map = null;
+        _panicBunker = false;
+        _pingSamples.Clear();
+        _lastPing = DateTime.MinValue;
+        _lastPingMs = null;
+        _pingFailed = false;
+        _pingSpike = false;
 
         LoadHotkey();
 
@@ -262,6 +286,9 @@ public sealed class GameStatsOverlayManager
 
             if (DateTime.UtcNow - _lastFetch > StatusInterval)
                 FetchStatus();
+
+            if (DateTime.UtcNow - _lastPing > PingInterval)
+                MeasurePing();
         }
         else
         {
@@ -323,6 +350,107 @@ public sealed class GameStatsOverlayManager
         }
 
         _vm.TimeText = loc.GetString("stats-overlay-time", ("time", time));
+
+        UpdateExtraLines(loc);
+    }
+
+    private void UpdateExtraLines(LocalizationManager loc)
+    {
+        // Players online
+        _vm.ShowPlayers = _cfg.GetCVar(CVars.StatsShowPlayers);
+        _vm.PlayersText = _players is not { } count
+            ? loc.GetString("stats-overlay-players-unknown")
+            : _softMax is > 0 and var max
+                ? loc.GetString("stats-overlay-players", ("count", count), ("max", max))
+                : loc.GetString("stats-overlay-players-nomax", ("count", count));
+
+        // Map: hidden if the server does not report one.
+        _vm.ShowMap = _cfg.GetCVar(CVars.StatsShowMap) && !string.IsNullOrWhiteSpace(_map);
+        _vm.MapText = loc.GetString("stats-overlay-map", ("map", _map ?? ""));
+
+        // Panic bunker: only shown while it is on, as a warning.
+        _vm.ShowPanic = _cfg.GetCVar(CVars.StatsShowPanic) && _panicBunker;
+        _vm.PanicText = loc.GetString("stats-overlay-panic");
+
+        // Ping
+        _vm.ShowPing = _cfg.GetCVar(CVars.StatsShowPing);
+        if (_pingFailed)
+        {
+            _vm.PingText = loc.GetString("stats-overlay-ping-none");
+            _vm.PingBrush = PingBad;
+        }
+        else if (_lastPingMs is { } ms)
+        {
+            var spike = _pingSpike && _cfg.GetCVar(CVars.StatsWarnPingSpike);
+            _vm.PingText = loc.GetString(spike ? "stats-overlay-ping-spike" : "stats-overlay-ping", ("ms", ms));
+            _vm.PingBrush = spike || ms >= 150 ? PingBad : ms >= 80 ? PingMid : PingGood;
+        }
+        else
+        {
+            _vm.PingText = loc.GetString("stats-overlay-ping-measuring");
+            _vm.PingBrush = Avalonia.Media.Brushes.Gray;
+        }
+    }
+
+    private static readonly Avalonia.Media.IBrush PingGood = new ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#2E9E5B"));
+    private static readonly Avalonia.Media.IBrush PingMid = new ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#D08A1E"));
+    private static readonly Avalonia.Media.IBrush PingBad = new ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#D64545"));
+
+    //
+    // Ping and spike detection
+    //
+
+    private async void MeasurePing()
+    {
+        if (_pinging || _address == null)
+            return;
+
+        _pinging = true;
+        _lastPing = DateTime.UtcNow;
+        var process = _process;
+        try
+        {
+            // One attempt per sample: the best-of-three used elsewhere would hide exactly the spikes we look for.
+            var ms = await ServerPing.MeasureAsync(_address, attempts: 1);
+            if (_process != process)
+                return; // Tracking stopped or switched to another game meanwhile.
+
+            if (ms is not { } value)
+            {
+                _pingFailed = true;
+                _pingSpike = false;
+                return;
+            }
+
+            _pingFailed = false;
+
+            // A spike: at least twice the usual value and at least 40 ms worse (so 5 -> 12 ms is no alarm).
+            // Needs a few samples first, and spikes are not added to the baseline.
+            _pingSpike = false;
+            if (_pingSamples.Count >= 3)
+            {
+                var sorted = _pingSamples.ToArray();
+                Array.Sort(sorted);
+                var baseline = sorted[sorted.Length / 2];
+                _pingSpike = value >= baseline * 2 && value - baseline >= 40;
+            }
+
+            _lastPingMs = value;
+            if (!_pingSpike)
+            {
+                _pingSamples.Add(value);
+                if (_pingSamples.Count > PingHistory)
+                    _pingSamples.RemoveAt(0);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Debug(e, "Stats overlay: ping failed");
+        }
+        finally
+        {
+            _pinging = false;
+        }
     }
 
     //
@@ -353,6 +481,11 @@ public sealed class GameStatsOverlayManager
                 ? rl.GetInt32()
                 : null;
 
+            _players = ReadInt(root, "players");
+            _softMax = ReadInt(root, "soft_max_players");
+            _map = ReadString(root, "map");
+            _panicBunker = root.TryGetProperty("panic_bunker", out var pb) && pb.ValueKind == JsonValueKind.True;
+
             _roundStart = ReadString(root, "round_start_time") is { } s
                 && DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt)
                     ? dt
@@ -366,6 +499,13 @@ public sealed class GameStatsOverlayManager
         {
             _fetching = false;
         }
+    }
+
+    private static int? ReadInt(JsonElement root, string name)
+    {
+        return root.TryGetProperty(name, out var el) && el.ValueKind == JsonValueKind.Number && el.TryGetInt32(out var v)
+            ? v
+            : null;
     }
 
     private static string? ReadString(JsonElement root, string name)

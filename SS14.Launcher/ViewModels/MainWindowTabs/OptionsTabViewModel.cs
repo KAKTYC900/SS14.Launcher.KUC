@@ -161,6 +161,56 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         }
     }
 
+    public bool StatsShowPlayers
+    {
+        get => Cfg.GetCVar(CVars.StatsShowPlayers);
+        set
+        {
+            Cfg.SetCVar(CVars.StatsShowPlayers, value);
+            Cfg.CommitConfig();
+        }
+    }
+
+    public bool StatsShowMap
+    {
+        get => Cfg.GetCVar(CVars.StatsShowMap);
+        set
+        {
+            Cfg.SetCVar(CVars.StatsShowMap, value);
+            Cfg.CommitConfig();
+        }
+    }
+
+    public bool StatsShowPanic
+    {
+        get => Cfg.GetCVar(CVars.StatsShowPanic);
+        set
+        {
+            Cfg.SetCVar(CVars.StatsShowPanic, value);
+            Cfg.CommitConfig();
+        }
+    }
+
+    public bool StatsShowPing
+    {
+        get => Cfg.GetCVar(CVars.StatsShowPing);
+        set
+        {
+            Cfg.SetCVar(CVars.StatsShowPing, value);
+            Cfg.CommitConfig();
+        }
+    }
+
+    public bool StatsWarnPingSpike
+    {
+        get => Cfg.GetCVar(CVars.StatsWarnPingSpike);
+        set
+        {
+            Cfg.SetCVar(CVars.StatsWarnPingSpike, value);
+            Cfg.CommitConfig();
+        }
+    }
+
     private bool _capturingKey;
 
     public bool IsCapturingKey => _capturingKey;

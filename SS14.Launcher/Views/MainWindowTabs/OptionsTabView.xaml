@@ -129,6 +129,14 @@
           <Button Content="{loc:Loc tab-options-stats-overlay-key-reset}" Command="{Binding ResetKey}" />
         </StackPanel>
 
+        <WrapPanel Orientation="Horizontal" Margin="4 0" IsVisible="{Binding StatsOverlaySupported}">
+          <CheckBox Margin="0 0 12 0" IsChecked="{Binding StatsShowPlayers}" Content="{loc:Loc tab-options-stats-players}" />
+          <CheckBox Margin="0 0 12 0" IsChecked="{Binding StatsShowMap}" Content="{loc:Loc tab-options-stats-map}" />
+          <CheckBox Margin="0 0 12 0" IsChecked="{Binding StatsShowPanic}" Content="{loc:Loc tab-options-stats-panic}" />
+          <CheckBox Margin="0 0 12 0" IsChecked="{Binding StatsShowPing}" Content="{loc:Loc tab-options-stats-ping}" />
+          <CheckBox Margin="0 0 12 0" IsChecked="{Binding StatsWarnPingSpike}" Content="{loc:Loc tab-options-stats-ping-spike}" />
+        </WrapPanel>
+
         <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding PrefetchFavoriteServers}" Content="{loc:Loc tab-options-prefetch-favorites}" />
         <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                    Text="{loc:Loc tab-options-prefetch-favorites-desc}"
