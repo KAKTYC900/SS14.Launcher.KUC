@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Media.Immutable;
 using Avalonia.Threading;
 using Serilog;
 using Splat;
@@ -391,9 +392,9 @@ public sealed class GameStatsOverlayManager
         }
     }
 
-    private static readonly Avalonia.Media.IBrush PingGood = new Avalonia.Media.Immutable.ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#2E9E5B"));
-    private static readonly Avalonia.Media.IBrush PingMid = new Avalonia.Media.Immutable.ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#D08A1E"));
-    private static readonly Avalonia.Media.IBrush PingBad = new Avalonia.Media.Immutable.ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#D64545"));
+    private static readonly Avalonia.Media.IBrush PingGood = new ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#2E9E5B"));
+    private static readonly Avalonia.Media.IBrush PingMid = new ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#D08A1E"));
+    private static readonly Avalonia.Media.IBrush PingBad = new ImmutableSolidColorBrush(Avalonia.Media.Color.Parse("#D64545"));
 
     //
     // Ping and spike detection

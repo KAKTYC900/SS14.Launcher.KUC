@@ -7,7 +7,7 @@ namespace SS14.Launcher.ViewModels;
 /// <remarks>
 /// Written with plain properties (no source generator), so it also builds when the generator output is stale.
 /// </remarks>
-public sealed class StatsOverlayViewModel : ObservableObject
+public sealed partial class StatsOverlayViewModel : ObservableObject
 {
     private string _roundText = "";
 
