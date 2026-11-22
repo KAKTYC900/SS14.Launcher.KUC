@@ -137,6 +137,13 @@ public static class CVars
     /// <summary>Modifiers of the stats panel key: 1 = Shift, 2 = Ctrl, 4 = Alt (default Shift).</summary>
     public static readonly CVarDef<int> StatsOverlayMods = CVarDef.Create("StatsOverlayMods", 1);
 
+    // Which extra lines the in-game stats panel shows.
+    public static readonly CVarDef<bool> StatsShowPlayers = CVarDef.Create("StatsShowPlayers", true);
+    public static readonly CVarDef<bool> StatsShowMap = CVarDef.Create("StatsShowMap", true);
+    public static readonly CVarDef<bool> StatsShowPanic = CVarDef.Create("StatsShowPanic", true);
+    public static readonly CVarDef<bool> StatsShowPing = CVarDef.Create("StatsShowPing", true);
+    public static readonly CVarDef<bool> StatsWarnPingSpike = CVarDef.Create("StatsWarnPingSpike", true);
+
     /// <summary>Servers watched by the Notifications tab, as JSON (see WatchedServerDto).</summary>
     public static readonly CVarDef<string> WatchedServers = CVarDef.Create("WatchedServers", "[]");
 

@@ -20,6 +20,13 @@
       <TextBlock Text="{Binding CkeyText}" Foreground="{DynamicResource ThemeForegroundBrush}" />
       <TextBlock Text="{Binding ModeText}" Foreground="{DynamicResource ThemeForegroundBrush}" />
       <TextBlock Text="{Binding TimeText}" Foreground="{DynamicResource ThemeForegroundBrush}" />
+      <TextBlock Text="{Binding PlayersText}" IsVisible="{Binding ShowPlayers}"
+                 Foreground="{DynamicResource ThemeForegroundBrush}" />
+      <TextBlock Text="{Binding MapText}" IsVisible="{Binding ShowMap}"
+                 Foreground="{DynamicResource ThemeForegroundBrush}" />
+      <TextBlock Text="{Binding PanicText}" IsVisible="{Binding ShowPanic}" FontWeight="Bold"
+                 Foreground="#E0A030" />
+      <TextBlock Text="{Binding PingText}" IsVisible="{Binding ShowPing}" Foreground="{Binding PingBrush}" />
     </StackPanel>
   </Panel>
 </Window>

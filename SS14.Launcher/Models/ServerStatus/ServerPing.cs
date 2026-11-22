@@ -12,11 +12,11 @@ namespace SS14.Launcher.Models.ServerStatus;
 /// </summary>
 public static class ServerPing
 {
-    private const int Attempts = 3;
+    private const int DefaultAttempts = 3;
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(3);
 
     /// <returns>Best time in milliseconds, or null if the server could not be reached.</returns>
-    public static async Task<int?> MeasureAsync(string address, CancellationToken cancel = default)
+    public static async Task<int?> MeasureAsync(string address, CancellationToken cancel = default, int attempts = DefaultAttempts)
     {
         if (!UriHelper.TryParseSs14Uri(address, out var parsed))
             return null;
@@ -32,7 +32,7 @@ public static class ServerPing
         }
 
         long best = long.MaxValue;
-        for (var i = 0; i < Attempts; i++)
+        for (var i = 0; i < attempts; i++)
         {
             try
             {
